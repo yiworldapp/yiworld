@@ -22,7 +22,7 @@ export default async function NewEventPage() {
       </div>
       <EventForm
         verticals={verticals || []}
-        committeeMembers={committee || []}
+        committeeMembers={(committee as any) || []}
         userId={user.id}
       />
     </div>

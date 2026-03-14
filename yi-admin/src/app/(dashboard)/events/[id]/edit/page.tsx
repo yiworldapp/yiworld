@@ -37,7 +37,7 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
       <EventForm
         event={event as any}
         verticals={verticals || []}
-        committeeMembers={committee || []}
+        committeeMembers={(committee as any) || []}
         userId={user.id}
       />
     </div>
