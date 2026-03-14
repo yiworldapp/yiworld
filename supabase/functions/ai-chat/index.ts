@@ -6,45 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-// ── YI Organisational Knowledge (static) ────────────────────────────────────
-const YI_KNOWLEDGE = `
-ABOUT YOUNG INDIANS (YI):
-Young Indians (YI) is the youth wing of the Confederation of Indian Industry (CII), India's premier industry body. YI brings together young business leaders, entrepreneurs, and professionals between the ages of 25 and 45 to collaborate, network, and contribute to nation-building.
-
-YI KANPUR CHAPTER:
-The Young Indians Kanpur Chapter is one of the active YI chapters in Uttar Pradesh. Members come from diverse industries including manufacturing, retail, healthcare, education, and technology. The chapter organises regular events, knowledge sessions, networking meets, and social impact initiatives.
-
-MEMBERSHIP:
-- Open to individuals aged 25–45 years
-- Members are typically entrepreneurs, business owners, professionals, or young executives
-- Membership is renewed annually
-- Benefits include: access to chapter events, national YI events, privileges & discounts from partner brands, and a strong professional network
-- To join: reach out to the chapter leadership or apply through the CII/YI portal
-
-YI VERTICALS / INITIATIVES:
-YI runs several national verticals that chapters participate in:
-- YI-YUVA: Youth empowerment and education initiative
-- YI-WISE: Women in Social Endeavour — empowering women entrepreneurs and leaders
-- YI-HEAL: Health and wellness initiative
-- YI-SUSTAIN: Sustainability and environment initiative
-- YI-LEAD: Leadership development programs
-
-CHAPTER ACTIVITIES:
-- Monthly chapter meetings
-- Annual flagship events (varies by chapter)
-- Business networking sessions
-- Social impact projects
-- National YI conclaves and summits
-- Sports and wellness activities for members
-
-APP FEATURES (what this app does):
-- Events: View upcoming and past chapter events
-- Members: Browse and connect with fellow YI members
-- Birthdays: See member birthdays this month
-- Privileges: Exclusive discounts and offers from partner brands (online & offline)
-- Chat: Ask the YI Assistant anything
-`
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -82,6 +43,16 @@ serve(async (req) => {
     const wantsEvents    = /event|meetup|meet|schedule|upcoming|when|past event|previous/i.test(lastUserMessage)
     const wantsOffers    = /offer|discount|deal|privilege|coupon|benefit|cashback|freebie|online offer|offline offer|in.?store/i.test(lastUserMessage)
     const wantsPartners  = /partner|mou|collaboration|tie.?up|sponsor/i.test(lastUserMessage)
+
+    // ── Fetch YI knowledge from DB (single row, fast) ────────────────────────
+    const { data: knowledgeRow } = await serviceClient
+      .from('yi_knowledge')
+      .select('content')
+      .eq('id', 'main')
+      .single()
+
+    const yiKnowledge = knowledgeRow?.content ??
+      `Young Indians (YI) is the youth wing of the Confederation of Indian Industry (CII). The YI Kanpur Chapter serves members aged 25-45 who are entrepreneurs, business owners and professionals.`
 
     // ── Parallel DB fetches ───────────────────────────────────────────────────
     const fetchList: Promise<any>[] = [
@@ -354,7 +325,7 @@ Here's what I can help you with:
 🤝 Partners & MOUs
 
 ORGANISATION KNOWLEDGE:
-${YI_KNOWLEDGE}
+${yiKnowledge}
 
 LIVE DATA:
 ${contextParts.join('\n\n')}`
