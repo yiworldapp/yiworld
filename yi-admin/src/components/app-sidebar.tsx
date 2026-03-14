@@ -54,6 +54,7 @@ export function AppSidebar({ profile }: { profile: AdminUser }) {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={true}
               className={cn(
                 'flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors',
                 isActive
