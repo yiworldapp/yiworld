@@ -259,6 +259,8 @@ serve(async (req) => {
         return `- [Online] ${o.brand_name}${o.category ? ` (${o.category})` : ''}: ${o.title}${o.discount_label ? ' — ' + o.discount_label : ''}${code}${expiry}${claim}`
       }).join('\n')
       contextParts.push(`Online Member Offers:\n${oList}`)
+    } else {
+      contextParts.push('Online Member Offers: None currently active.')
     }
 
     // Offline offers
@@ -270,6 +272,8 @@ serve(async (req) => {
         return `- [In-Store] ${o.business_name}${o.category ? ` (${o.category})` : ''}${loc ? ` — ${loc}` : ''}: ${o.offer_description}${o.discount_label ? ' — ' + o.discount_label : ''}${expiry}${avail}`
       }).join('\n')
       contextParts.push(`In-Store Member Offers:\n${oList}`)
+    } else {
+      contextParts.push('In-Store Member Offers: None currently active.')
     }
 
     // MOUs
@@ -319,24 +323,25 @@ ANSWERING RULES:
 5. Events: date + venue on one line, then 1 short line of description max.
 6. Offers: Online (show coupon code prominently) vs In-Store (show how to avail).
 7. If you don't have specific info, say so in one line, then show the options block.
+8. NEVER invent, guess, or fabricate offers, events, members, or any data. If LIVE DATA shows no offers, say "No active offers right now" — do not make any up.
 
-FORMAT FOR EVENTS:
-📅 Event Name
-17 Mar 2026 · Mumbai
-Short description here.
+FORMAT FOR EVENTS (use only real data from LIVE DATA):
+📅 [Event Title]
+[Date] · [Venue]
+[One line description]
 
-FORMAT FOR OFFERS:
-🟢 Brand Name (Online)
-20% OFF — Code: YI20
-Visit: website.com
+FORMAT FOR OFFERS (use only real data from LIVE DATA):
+🟢 [Brand Name] (Online)
+[Discount] — Code: [Code if available]
+Visit: [website]
 
-🟠 Business Name (In-Store)
-15% off — Show YI card at billing
+🟠 [Business Name] (In-Store)
+[Discount] — [How to avail]
 
-FORMAT FOR MEMBERS:
-👤 Full Name
-CEO @ Company | YI Vertical
-📞 +91 98765 43210
+FORMAT FOR MEMBERS (use only real data from LIVE DATA):
+👤 [Full Name]
+[Job Title] @ [Company] | [YI Vertical]
+📞 [Phone]
 
 WHEN YOU DON'T HAVE THE ANSWER:
 Say it in one friendly line, then add:
