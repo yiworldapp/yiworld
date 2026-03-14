@@ -1,0 +1,43 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app@latest yi-admin --typescript --tailwind --eslint --app --src-dir=false --import-alias=\"@/*\" --no-turbopack --yes)",
+      "Bash(npm install:*)",
+      "Bash(npx shadcn@latest init --yes --defaults)",
+      "Bash(npx shadcn@latest add badge card dialog dropdown-menu form input label select separator sheet sidebar skeleton table tabs textarea toast --yes)",
+      "Bash(npx shadcn@latest add badge card dialog dropdown-menu form input label select separator sheet sidebar skeleton table tabs textarea avatar command popover sonner --yes)",
+      "Bash(flutter create:*)",
+      "Bash(sed -i '' 's/freezed_annotation: \\\\^2.4.4/freezed_annotation: ^3.0.0/' pubspec.yaml)",
+      "Bash(sed -i '' 's/freezed: \\\\^2.5.8/freezed: ^3.0.0/' pubspec.yaml)",
+      "Bash(flutter pub:*)",
+      "Bash(npx shadcn@latest add switch --yes)",
+      "Bash(npx tsc:*)",
+      "Bash(brew install:*)",
+      "Bash(curl -fsSL https://raw.githubusercontent.com/supabase/cli/main/install.sh)",
+      "Bash(sh)",
+      "Bash(npx supabase:*)",
+      "Bash(flutter devices:*)",
+      "Bash(flutter emulators:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(open -a Simulator)",
+      "Bash(flutter run:*)",
+      "Bash(flutter --version)",
+      "Bash(flutter ps:*)",
+      "Bash(supabase --version)",
+      "Bash(dart run:*)",
+      "Bash(flutter build:*)",
+      "Bash(java -version)",
+      "Bash(/usr/libexec/java_home -V)",
+      "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home flutter build apk --release)",
+      "Bash(npx shadcn@latest add calendar --yes)",
+      "Bash(grep -r \"personal_bio\\\\|business_bio\\\\|industry\\\\|yi_position\\\\|personal_website\\\\|linkedin\\\\|instagram\" /Users/abdulquadir/Desktop/Projects/brandhero/youngindians/lib --include=*.dart -l)",
+      "Bash(./gradlew assembleRelease --stacktrace)",
+      "Bash(find /Users/abdulquadir/Desktop/Projects/brandhero/youngindians/lib -name *onboard* -o -name *profile*)",
+      "Bash(npm init:*)",
+      "Bash(node import-members.js)",
+      "Bash(git add:*)",
+      "Bash(git rm:*)",
+      "Bash(rm -rf yi-admin/.git)"
+    ]
+  }
+}

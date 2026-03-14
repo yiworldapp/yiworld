@@ -88,7 +88,7 @@ CREATE TABLE public.profiles (
   anniversary_date    DATE,             -- only set when relationship_status = 'married'
   blood_group         TEXT,             -- A+, A-, B+, B-, AB+, AB-, O+, O-
 
-  -- Tags (arrays of up to 3 each)
+  -- Tags (arrays of up to 4 each)
   business_tags       TEXT[] NOT NULL DEFAULT '{}',
   hobby_tags          TEXT[] NOT NULL DEFAULT '{}',
 

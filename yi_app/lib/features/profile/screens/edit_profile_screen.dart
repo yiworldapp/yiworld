@@ -474,17 +474,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
             // ── Business Tags ──────────────────────────────────────────────
             _tagSection(
-              title: 'Business Tags (up to 3)',
+              title: 'Business Tags (up to 4)',
               predefined: AppConstants.businessTags,
               selected: _businessTags,
               customCtrl: _customBusinessTag,
               onToggle: (tag) => setState(() {
                 if (_businessTags.contains(tag)) _businessTags.remove(tag);
-                else if (_businessTags.length < 3) _businessTags.add(tag);
+                else if (_businessTags.length < 4) _businessTags.add(tag);
               }),
               onAddCustom: () {
                 final tag = _customBusinessTag.text.trim();
-                if (tag.isNotEmpty && _businessTags.length < 3) {
+                if (tag.isNotEmpty && _businessTags.length < 4) {
                   setState(() { _businessTags.add(tag); _customBusinessTag.clear(); });
                 }
               },
@@ -493,17 +493,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
             // ── Hobby Tags ────────────────────────────────────────────────
             _tagSection(
-              title: 'Hobby Tags (up to 3)',
+              title: 'Hobby Tags (up to 4)',
               predefined: AppConstants.hobbyTags,
               selected: _hobbyTags,
               customCtrl: _customHobbyTag,
               onToggle: (tag) => setState(() {
                 if (_hobbyTags.contains(tag)) _hobbyTags.remove(tag);
-                else if (_hobbyTags.length < 3) _hobbyTags.add(tag);
+                else if (_hobbyTags.length < 4) _hobbyTags.add(tag);
               }),
               onAddCustom: () {
                 final tag = _customHobbyTag.text.trim();
-                if (tag.isNotEmpty && _hobbyTags.length < 3) {
+                if (tag.isNotEmpty && _hobbyTags.length < 4) {
                   setState(() { _hobbyTags.add(tag); _customHobbyTag.clear(); });
                 }
               },
@@ -724,7 +724,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         Row(children: [
           _label(title),
           const Spacer(),
-          Text('${selected.length}/3', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
+          Text('${selected.length}/4', style: const TextStyle(color: AppColors.textMuted, fontSize: 12)),
         ]),
         const SizedBox(height: 10),
         Wrap(
@@ -750,7 +750,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             );
           }).toList(),
         ),
-        if (selected.length < 3) ...[
+        if (selected.length < 4) ...[
           const SizedBox(height: 10),
           Row(children: [
             Expanded(
