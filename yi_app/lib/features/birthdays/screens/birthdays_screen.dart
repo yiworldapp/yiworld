@@ -80,7 +80,6 @@ class _BirthdaysScreenState extends State<BirthdaysScreen>
                       gravity: 0.3,
                       minBlastForce: 8,
                       maxBlastForce: 30,
-                      displayThreshold: 0.1,
                       shouldLoop: false,
                       colors: const [
                         AppColors.yellow,
