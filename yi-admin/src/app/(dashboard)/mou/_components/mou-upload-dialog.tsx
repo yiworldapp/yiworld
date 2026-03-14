@@ -96,7 +96,7 @@ export function MOUUploadDialog({ userId }: { userId: string }) {
           </div>
           <div className="space-y-1.5">
             <Label>Tag *</Label>
-            <Select value={tag} onValueChange={setTag}>
+            <Select value={tag} onValueChange={(v) => v && setTag(v)}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

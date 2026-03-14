@@ -105,7 +105,7 @@ export function OfflineOfferForm({ offer }: Props) {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Category</Label>
-                  <Select value={category} onValueChange={setCategory}>
+                  <Select value={category} onValueChange={(v) => v && setCategory(v)}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
                       {OFFLINE_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}

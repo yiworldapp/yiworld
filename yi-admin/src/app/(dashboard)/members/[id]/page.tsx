@@ -175,7 +175,7 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
                 <div className="pt-2">
                   <p className="text-xs text-muted-foreground mb-2">Business Tags</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {member.business_tags.map((t) => (
+                    {member.business_tags.map((t: string) => (
                       <Badge key={t} variant="outline" className="text-xs border-border">{t}</Badge>
                     ))}
                   </div>
@@ -185,7 +185,7 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
                 <div className="pt-2">
                   <p className="text-xs text-muted-foreground mb-2">Hobbies</p>
                   <div className="flex flex-wrap gap-1.5">
-                    {member.hobby_tags.map((t) => (
+                    {member.hobby_tags.map((t: string) => (
                       <Badge key={t} variant="outline" className="text-xs border-border">{t}</Badge>
                     ))}
                   </div>
