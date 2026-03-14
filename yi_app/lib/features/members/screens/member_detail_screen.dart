@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -185,7 +186,7 @@ class MemberDetailScreen extends StatelessWidget {
                                   final digits = phone.replaceAll(RegExp(r'[^\d]'), '');
                                   launchUrl(Uri.parse('https://wa.me/$digits'));
                                 },
-                                icon: const Icon(Icons.chat_outlined, size: 16),
+                                icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 16),
                                 label: const Text('WhatsApp'),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: const Color(0xFF25D366),
