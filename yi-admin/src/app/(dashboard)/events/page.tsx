@@ -12,7 +12,7 @@ export default async function EventsPage() {
   const { data: adminUser } = await supabase
     .from('admin_users').select('role').eq('id', user!.id).single()
 
-  const query = supabase
+  let query = supabase
     .from('events')
     .select(`*, verticals(label, color_hex, slug), event_rsvps(count)`)
     .order('starts_at', { ascending: false })
