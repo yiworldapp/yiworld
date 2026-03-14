@@ -22,7 +22,7 @@ export function LinkButton({ href, variant, size, className, children, target, r
     )
   }
   return (
-    <Link href={href} className={cn(buttonVariants({ variant, size }), className)}>
+    <Link href={href} prefetch={true} className={cn(buttonVariants({ variant, size }), className)}>
       {children}
     </Link>
   )
