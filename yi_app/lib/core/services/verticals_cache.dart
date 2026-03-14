@@ -1,0 +1,46 @@
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../theme/app_colors.dart';
+
+/// Fetched once at startup. All screens call colorForSlug / labelForSlug
+/// synchronously after that.
+class VerticalsCache {
+  VerticalsCache._();
+
+  static final Map<String, Map<String, dynamic>> _cache = {};
+  static bool _loaded = false;
+
+  static Future<void> load() async {
+    if (_loaded) return;
+    try {
+      final data = await Supabase.instance.client
+          .from('verticals')
+          .select('slug, label, color_hex');
+      for (final v in (data as List)) {
+        _cache[v['slug'] as String] = Map<String, dynamic>.from(v as Map);
+      }
+      _loaded = true;
+    } catch (_) {
+      // Silently fall back to hardcoded colors if fetch fails
+    }
+  }
+
+  static Color colorForSlug(String? slug) {
+    if (slug == null || slug == 'none') return AppColors.textMuted;
+    final hex = _cache[slug]?['color_hex'] as String?;
+    if (hex == null) return AppColors.textMuted;
+    return _hexToColor(hex);
+  }
+
+  static String labelForSlug(String? slug) {
+    if (slug == null || slug == 'none') return '';
+    final label = _cache[slug]?['label'] as String?;
+    return (label ?? slug).toUpperCase();
+  }
+
+  static Color _hexToColor(String hex) {
+    final h = hex.replaceFirst('#', '').padLeft(6, '0');
+    return Color(int.parse('FF$h', radix: 16));
+  }
+}

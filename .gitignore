@@ -1,0 +1,24 @@
+# yi-admin (Next.js)
+yi-admin/.next/
+yi-admin/node_modules/
+yi-admin/.env
+yi-admin/.env.local
+yi-admin/.env.production
+
+# yi_app (Flutter)
+yi_app/build/
+yi_app/.dart_tool/
+yi_app/.flutter-plugins
+yi_app/.flutter-plugins-dependencies
+yi_app/*.iml
+yi_app/android/.gradle/
+yi_app/android/local.properties
+yi_app/ios/Pods/
+yi_app/ios/.symlinks/
+
+# General
+.DS_Store
+*.log
+
+# Scripts
+scripts/node_modules/
