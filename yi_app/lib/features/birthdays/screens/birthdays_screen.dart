@@ -29,9 +29,9 @@ class _BirthdaysScreenState extends State<BirthdaysScreen>
       vsync: this,
       initialIndex: DateTime.now().month - 1,
     );
-    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
-    // ShellRoute recreates this widget on every tab visit, so initState fires each time
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    _confettiController = ConfettiController(duration: const Duration(seconds: 2));
+    // Delay slightly so the layout is fully settled before blasting confetti
+    Future.delayed(const Duration(milliseconds: 300), () {
       if (mounted) _confettiController.play();
     });
   }
@@ -67,20 +67,32 @@ class _BirthdaysScreenState extends State<BirthdaysScreen>
             controller: _tabController,
             children: List.generate(12, (i) => _BirthdayMonthView(month: i + 1)),
           ),
-          Align(
-            alignment: Alignment.topCenter,
-            child: ConfettiWidget(
-              confettiController: _confettiController,
-              blastDirectionality: BlastDirectionality.explosive,
-              numberOfParticles: 30,
-              gravity: 0.3,
-              colors: const [
-                AppColors.yellow,
-                Colors.pink,
-                Colors.blue,
-                Colors.green,
-                Colors.orange,
-              ],
+          IgnorePointer(
+            child: SizedBox.expand(
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: ConfettiWidget(
+                      confettiController: _confettiController,
+                      blastDirectionality: BlastDirectionality.explosive,
+                      numberOfParticles: 40,
+                      gravity: 0.3,
+                      minBlastForce: 8,
+                      maxBlastForce: 30,
+                      displayThreshold: 0.1,
+                      shouldLoop: false,
+                      colors: const [
+                        AppColors.yellow,
+                        Colors.pink,
+                        Colors.blue,
+                        Colors.green,
+                        Colors.orange,
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
