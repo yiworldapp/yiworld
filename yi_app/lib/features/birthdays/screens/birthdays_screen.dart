@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:confetti/confetti.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -16,6 +17,7 @@ class BirthdaysScreen extends StatefulWidget {
 class _BirthdaysScreenState extends State<BirthdaysScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  late ConfettiController _confettiController;
   final _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -27,11 +29,17 @@ class _BirthdaysScreenState extends State<BirthdaysScreen>
       vsync: this,
       initialIndex: DateTime.now().month - 1,
     );
+    _confettiController = ConfettiController(duration: const Duration(seconds: 1));
+    // ShellRoute recreates this widget on every tab visit, so initState fires each time
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _confettiController.play();
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _confettiController.dispose();
     super.dispose();
   }
 
@@ -53,9 +61,29 @@ class _BirthdaysScreenState extends State<BirthdaysScreen>
           tabs: _months.map((m) => Tab(text: m)).toList(),
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: List.generate(12, (i) => _BirthdayMonthView(month: i + 1)),
+      body: Stack(
+        children: [
+          TabBarView(
+            controller: _tabController,
+            children: List.generate(12, (i) => _BirthdayMonthView(month: i + 1)),
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _confettiController,
+              blastDirectionality: BlastDirectionality.explosive,
+              numberOfParticles: 30,
+              gravity: 0.3,
+              colors: const [
+                AppColors.yellow,
+                Colors.pink,
+                Colors.blue,
+                Colors.green,
+                Colors.orange,
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
