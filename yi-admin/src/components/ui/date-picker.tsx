@@ -44,6 +44,9 @@ export function DatePicker({ date, onDateChange, placeholder = 'Pick a date' }: 
           selected={parsed && isValid(parsed) ? parsed : undefined}
           onSelect={handleSelect}
           initialFocus
+          captionLayout="dropdown"
+          fromYear={1940}
+          toYear={new Date().getFullYear()}
         />
       </PopoverContent>
     </Popover>
