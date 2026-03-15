@@ -108,8 +108,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _lastNameCtrl.text       = data['last_name']       ?? '';
       _primaryEmailCtrl.text   = data['primary_email']   ?? '';
       _secondaryEmailCtrl.text = data['secondary_email'] ?? '';
-      _countryCode             = data['phone_country_code']           ?? '+91';
-      _primaryPhoneCtrl.text   = data['phone']                        ?? '';
+      _countryCode             = data['phone_country_code'] ?? '+91';
+      final rawPhone = (data['phone'] as String?) ?? '';
+      if (rawPhone.startsWith('+91')) {
+        _countryCode = '+91';
+        _primaryPhoneCtrl.text = rawPhone.substring(3);
+      } else if (rawPhone.startsWith('91') && rawPhone.length >= 12) {
+        _countryCode = '+91';
+        _primaryPhoneCtrl.text = rawPhone.substring(2);
+      } else {
+        _primaryPhoneCtrl.text = rawPhone;
+      }
       _secondaryCountryCode    = data['secondary_phone_country_code'] ?? '+91';
       _secondaryPhoneCtrl.text = data['secondary_phone']              ?? '';
       _dob = data['dob'] != null ? DateTime.tryParse(data['dob'] as String) : null;
@@ -332,6 +341,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       if (authPhone.startsWith('+91')) {
                         _countryCode = '+91';
                         _primaryPhoneCtrl.text = authPhone.substring(3);
+                      } else if (authPhone.startsWith('91') && authPhone.length >= 12) {
+                        _countryCode = '+91';
+                        _primaryPhoneCtrl.text = authPhone.substring(2);
                       } else {
                         _primaryPhoneCtrl.text = authPhone;
                       }

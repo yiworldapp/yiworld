@@ -76,9 +76,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (authPhone.startsWith('+91')) {
       _countryCode = '+91';
       _primaryPhoneCtrl.text = authPhone.substring(3);
+    } else if (authPhone.startsWith('91') && authPhone.length >= 12) {
+      _countryCode = '+91';
+      _primaryPhoneCtrl.text = authPhone.substring(2);
     } else if (authPhone.startsWith('+')) {
-      final spaceIdx = authPhone.indexOf(RegExp(r'\d'));
-      _primaryPhoneCtrl.text = authPhone.substring(spaceIdx > 0 ? spaceIdx : 1);
+      _primaryPhoneCtrl.text = authPhone.substring(1);
     } else {
       _primaryPhoneCtrl.text = authPhone;
     }
