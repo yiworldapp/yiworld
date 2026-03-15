@@ -30,6 +30,8 @@ export interface Profile {
   last_name: string | null
   headshot_url: string | null
   dob: string | null
+  address_line1: string | null
+  address_line2: string | null
   country: string | null
   state: string | null
   city: string | null

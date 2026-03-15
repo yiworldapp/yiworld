@@ -68,6 +68,23 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _customHobbyTag    = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    // Pre-fill primary phone from auth (read-only — auth phone is the login identity)
+    final authPhone = Supabase.instance.client.auth.currentUser?.phone ?? '';
+    // Strip country code prefix for display in the number field
+    if (authPhone.startsWith('+91')) {
+      _countryCode = '+91';
+      _primaryPhoneCtrl.text = authPhone.substring(3);
+    } else if (authPhone.startsWith('+')) {
+      final spaceIdx = authPhone.indexOf(RegExp(r'\d'));
+      _primaryPhoneCtrl.text = authPhone.substring(spaceIdx > 0 ? spaceIdx : 1);
+    } else {
+      _primaryPhoneCtrl.text = authPhone;
+    }
+  }
+
+  @override
   void dispose() {
     for (final c in [
       _firstNameCtrl, _lastNameCtrl, _primaryEmailCtrl, _secondaryEmailCtrl,
@@ -89,7 +106,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         if (_firstNameCtrl.text.trim().isEmpty) return 'First name is required';
         if (_lastNameCtrl.text.trim().isEmpty)  return 'Last name is required';
         if (_primaryEmailCtrl.text.trim().isEmpty) return 'Primary email is required';
-        if (_primaryPhoneCtrl.text.trim().isEmpty) return 'Primary phone is required';
         if (_dob == null) return 'Date of birth is required';
         return null;
       case 1:
@@ -186,7 +202,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         headshotUrl = supabase.storage.from('avatars').getPublicUrl(path);
       }
 
-      await supabase.from('profiles').update({
+      await supabase.from('profiles').upsert({
+        'id': userId,
         'first_name':         _firstNameCtrl.text.trim(),
         'last_name':          _lastNameCtrl.text.trim(),
         'primary_email':      _primaryEmailCtrl.text.trim().isEmpty ? null : _primaryEmailCtrl.text.trim(),
@@ -226,7 +243,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         'business_tags':      _businessTags.toList(),
         'hobby_tags':         _hobbyTags.toList(),
         'onboarding_done':    true,
-      }).eq('id', userId);
+      }, onConflict: 'id');
 
       if (mounted) context.go('/events');
     } catch (e) {
@@ -378,20 +395,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 16),
           _field('Secondary Email', _secondaryEmailCtrl, keyboard: TextInputType.emailAddress),
           const SizedBox(height: 16),
-          _fieldLabel('Primary Phone (WhatsApp) *'),
+          _fieldLabel('Primary Phone (WhatsApp)'),
           const SizedBox(height: 6),
           IntrinsicHeight(
             child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               _countryCodePicker(
                 value: _countryCode,
-                onChanged: (v) => setState(() => _countryCode = v),
+                onChanged: null, // read-only
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: _buildTextField(_primaryPhoneCtrl,
-                  keyboard: TextInputType.phone, hint: 'Phone number'),
+                  keyboard: TextInputType.phone,
+                  hint: 'Phone number',
+                  readOnly: true),
               ),
             ]),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            'Phone number linked to your account. You can change it later in Edit Profile.',
+            style: TextStyle(fontSize: 11, color: AppColors.textMuted),
           ),
           const SizedBox(height: 16),
           _fieldLabel('Secondary Phone'),
@@ -725,18 +749,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     TextInputType? keyboard,
     int maxLines = 1,
     ValueChanged<String>? onChanged,
+    bool readOnly = false,
   }) {
     return TextField(
       controller: ctrl,
       keyboardType: keyboard,
       maxLines: maxLines,
       onChanged: onChanged,
-      style: const TextStyle(color: AppColors.white),
+      readOnly: readOnly,
+      style: TextStyle(color: readOnly ? AppColors.textMuted : AppColors.white),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: AppColors.textMuted),
         filled: true,
-        fillColor: AppColors.card,
+        fillColor: readOnly ? AppColors.surfaceAlt : AppColors.card,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: AppColors.border),
@@ -754,11 +780,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _countryCodePicker({required String value, required ValueChanged<String> onChanged}) {
+  Widget _countryCodePicker({required String value, ValueChanged<String>? onChanged}) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: onChanged == null ? AppColors.surfaceAlt : AppColors.card,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.border),
       ),
@@ -766,12 +792,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: DropdownButton<String>(
           value: value,
           dropdownColor: AppColors.card,
-          style: const TextStyle(color: AppColors.white, fontSize: 14),
+          style: TextStyle(color: onChanged == null ? AppColors.textMuted : AppColors.white, fontSize: 14),
           items: AppConstants.countryCodes.map((c) => DropdownMenuItem<String>(
             value: c['code'],
             child: Text('${c['flag']} ${c['code']}'),
           )).toList(),
-          onChanged: (v) { if (v != null) onChanged(v); },
+          onChanged: onChanged == null ? null : (v) { if (v != null) onChanged(v); },
         ),
       ),
     );

@@ -21,10 +21,15 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: AppColors.black,
       body: FutureBuilder(
         future: Supabase.instance.client
-            .from('profiles').select('*').eq('id', user!.id).single(),
+            .from('profiles').select('*').eq('id', user!.id).maybeSingle(),
         builder: (ctx, snap) {
           if (snap.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: AppColors.green));
+          }
+          if (snap.hasError) {
+            return Center(
+              child: Text('Error loading profile', style: const TextStyle(color: AppColors.textMuted)),
+            );
           }
           final p = snap.data as Map<String, dynamic>? ?? {};
 
@@ -221,8 +226,9 @@ class ProfileScreen extends StatelessWidget {
                         _detailRow(Icons.badge_outlined, 'Position', AppConstants.positionLabel(yiPosition)),
                       if (memberSinceYear != null)
                         _detailRow(Icons.verified_outlined, 'YI Member Since', memberSinceYear.toString()),
-                      _detailRow(Icons.calendar_today_outlined, 'App Member Since',
-                          DateFormat('MMMM yyyy').format(DateTime.parse(p['created_at'] as String).toLocal())),
+                      if ((p['created_at'] as String?) != null)
+                        _detailRow(Icons.calendar_today_outlined, 'App Member Since',
+                            DateFormat('MMMM yyyy').format(DateTime.parse(p['created_at'] as String).toLocal())),
 
                       // ── Personal ─────────────────────────────────────────
                       if (dob != null ||

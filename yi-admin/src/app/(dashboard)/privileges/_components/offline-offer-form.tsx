@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { DatePicker } from '@/components/ui/date-picker'
 import { upsertOfflineOffer } from '../_actions/offer-actions'
 
 const OFFLINE_CATEGORIES = ['Restaurant', 'Hotel', 'Gym', 'Hospital', 'Spa', 'Retail', 'Cafe', 'Entertainment', 'Other']
@@ -157,20 +158,6 @@ export function OfflineOfferForm({ offer }: Props) {
         {/* ── Sidebar ── */}
         <div className="space-y-6">
           <Card className="border-border">
-            <CardHeader className="pb-3"><CardTitle className="text-base">Publishing</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="active" className="cursor-pointer">Active</Label>
-                <Switch id="active" checked={isActive} onCheckedChange={setIsActive} />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Expiry Date</Label>
-                <Input type="date" value={expiryDate} onChange={e => setExpiryDate(e.target.value)} />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border">
             <CardHeader className="pb-3"><CardTitle className="text-base">Logo</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               {offer?.logo_url && (
@@ -187,6 +174,20 @@ export function OfflineOfferForm({ offer }: Props) {
                 <img src={offer.banner_url} className="h-24 rounded border border-border object-cover w-full" alt="Banner" />
               )}
               <Input type="file" accept="image/*" onChange={e => setBannerFile(e.target.files?.[0] || null)} />
+            </CardContent>
+          </Card>
+
+          <Card className="border-border">
+            <CardHeader className="pb-3"><CardTitle className="text-base">Publishing</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="active" className="cursor-pointer">Active</Label>
+                <Switch id="active" checked={isActive} onCheckedChange={setIsActive} />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Expiry Date</Label>
+                <DatePicker date={expiryDate} onDateChange={setExpiryDate} />
+              </div>
             </CardContent>
           </Card>
         </div>

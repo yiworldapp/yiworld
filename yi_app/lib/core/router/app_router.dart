@@ -18,6 +18,7 @@ import '../../features/privileges/screens/privileges_screen.dart';
 import '../../features/chat/screens/chat_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
+import '../../features/profile/screens/change_phone_screen.dart';
 import '../../features/menu/screens/menu_screen.dart';
 import '../../features/menu/screens/mous_screen.dart';
 
@@ -161,6 +162,13 @@ GoRouter appRouter(AppRouterRef ref) {
             path: 'edit',
             name: 'edit-profile',
             builder: (ctx, state) => const EditProfileScreen(),
+            routes: [
+              GoRoute(
+                path: 'change-phone',
+                name: 'change-phone',
+                builder: (ctx, state) => const ChangePhoneScreen(),
+              ),
+            ],
           ),
         ],
       ),

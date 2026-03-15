@@ -91,9 +91,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Future<void> _loadProfile() async {
+    try {
     final data = await _supabase
         .from('profiles').select('*')
-        .eq('id', _supabase.auth.currentUser!.id).single();
+        .eq('id', _supabase.auth.currentUser!.id).maybeSingle();
+
+    if (data == null) {
+      // No profile row yet — show empty form so user can fill it in
+      if (mounted) setState(() => _loading = false);
+      return;
+    }
 
     setState(() {
       _existingHeadshotUrl = data['headshot_url'] as String?;
@@ -143,14 +150,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       _loading = false;
     });
+    } catch (e) {
+      if (mounted) {
+        setState(() => _loading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load profile: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
   }
 
   Future<void> _save() async {
     setState(() => _saving = true);
     try {
+      final userId = _supabase.auth.currentUser!.id;
       String? headshotUrl = _existingHeadshotUrl;
       if (_newHeadshot != null) {
-        final userId = _supabase.auth.currentUser!.id;
         final path   = '$userId/avatar.jpg';
         await _supabase.storage.from('avatars').upload(
           path, _newHeadshot!,
@@ -159,7 +174,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         headshotUrl = _supabase.storage.from('avatars').getPublicUrl(path);
       }
 
-      await _supabase.from('profiles').update({
+      await _supabase.from('profiles').upsert({
+        'id':                  userId,
         'first_name':          _firstNameCtrl.text.trim().isEmpty      ? null : _firstNameCtrl.text.trim(),
         'last_name':           _lastNameCtrl.text.trim().isEmpty        ? null : _lastNameCtrl.text.trim(),
         'primary_email':       _primaryEmailCtrl.text.trim().isEmpty    ? null : _primaryEmailCtrl.text.trim(),
@@ -196,7 +212,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'blood_group':         _bloodGroup,
         'business_tags':       _businessTags.toList(),
         'hobby_tags':          _hobbyTags.toList(),
-      }).eq('id', _supabase.auth.currentUser!.id);
+      }, onConflict: 'id');
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -303,16 +319,42 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ]),
             _field('Primary Email', _primaryEmailCtrl, type: TextInputType.emailAddress),
             _field('Secondary Email', _secondaryEmailCtrl, type: TextInputType.emailAddress),
-            _label('Primary Phone (WhatsApp)'),
+            Row(children: [
+              _label('Primary Phone (WhatsApp)'),
+              const Spacer(),
+              TextButton(
+                onPressed: () async {
+                  final changed = await context.push<bool>('/profile/edit/change-phone');
+                  if (changed == true) {
+                    // Reload the phone from auth
+                    final authPhone = _supabase.auth.currentUser?.phone ?? '';
+                    setState(() {
+                      if (authPhone.startsWith('+91')) {
+                        _countryCode = '+91';
+                        _primaryPhoneCtrl.text = authPhone.substring(3);
+                      } else {
+                        _primaryPhoneCtrl.text = authPhone;
+                      }
+                    });
+                  }
+                },
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: const Size(0, 0),
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text('Change', style: TextStyle(color: AppColors.green, fontSize: 13)),
+              ),
+            ]),
             const SizedBox(height: 6),
             IntrinsicHeight(
               child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 _countryCodePicker(
                   value: _countryCode,
-                  onChanged: (v) => setState(() => _countryCode = v),
+                  onChanged: null, // read-only — use Change button above
                 ),
                 const SizedBox(width: 8),
-                Expanded(child: _textField(_primaryPhoneCtrl, hint: 'Phone number', type: TextInputType.phone)),
+                Expanded(child: _textField(_primaryPhoneCtrl, hint: 'Phone number', type: TextInputType.phone, readOnly: true)),
               ]),
             ),
             const SizedBox(height: 16),
@@ -561,18 +603,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   Widget _textField(TextEditingController ctrl, {
-    String hint = '', TextInputType? type, int maxLines = 1, ValueChanged<String>? onChanged,
+    String hint = '', TextInputType? type, int maxLines = 1, ValueChanged<String>? onChanged, bool readOnly = false,
   }) {
     return TextField(
       controller: ctrl,
       keyboardType: type,
       maxLines: maxLines,
       onChanged: onChanged,
-      style: const TextStyle(color: AppColors.white),
+      readOnly: readOnly,
+      style: TextStyle(color: readOnly ? AppColors.textMuted : AppColors.white),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: AppColors.textMuted),
-        filled: true, fillColor: AppColors.card,
+        filled: true, fillColor: readOnly ? AppColors.surfaceAlt : AppColors.card,
         border:        OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.border)),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.border)),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.green)),
@@ -581,23 +624,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _countryCodePicker({required String value, required ValueChanged<String> onChanged}) {
+  Widget _countryCodePicker({required String value, ValueChanged<String>? onChanged}) {
     return Container(
       height: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: AppColors.card, borderRadius: BorderRadius.circular(10),
+        color: onChanged == null ? AppColors.surfaceAlt : AppColors.card,
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(color: AppColors.border),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
           dropdownColor: AppColors.card,
-          style: const TextStyle(color: AppColors.white, fontSize: 14),
+          style: TextStyle(color: onChanged == null ? AppColors.textMuted : AppColors.white, fontSize: 14),
           items: AppConstants.countryCodes.map((c) => DropdownMenuItem<String>(
             value: c['code'], child: Text('${c['flag']} ${c['code']}'),
           )).toList(),
-          onChanged: (v) { if (v != null) onChanged(v); },
+          onChanged: onChanged == null ? null : (v) { if (v != null) onChanged(v); },
         ),
       ),
     );

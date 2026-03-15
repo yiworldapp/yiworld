@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'package:photo_view/photo_view.dart';
+
 import '../../../core/constants/app_constants.dart';
 import '../../../core/services/verticals_cache.dart';
 import '../../../core/theme/app_colors.dart';
@@ -92,27 +94,43 @@ class MemberDetailScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const SizedBox(height: 56),
-                            Container(
-                              width: 96, height: 96,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: verticalColor, width: 2.5),
-                              ),
-                              child: ClipOval(
-                                child: m['headshot_url'] != null
-                                    ? CachedNetworkImage(
-                                        imageUrl: m['headshot_url'] as String,
-                                        fit: BoxFit.cover)
-                                    : Container(
-                                        color: AppColors.surfaceAlt,
-                                        child: Center(
-                                          child: Text(
-                                            initials.isEmpty ? '?' : initials,
-                                            style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: verticalColor),
+                            GestureDetector(
+                              onTap: m['headshot_url'] != null
+                                  ? () => Navigator.of(context, rootNavigator: true).push(
+                                        PageRouteBuilder(
+                                          opaque: false,
+                                          barrierColor: Colors.black,
+                                          pageBuilder: (_, __, ___) => _PhotoPreview(
+                                            url: m['headshot_url'] as String,
                                           ),
                                         ),
-                                      ),
+                                      )
+                                  : null,
+                              child: Hero(
+                                tag: m['headshot_url'] as String? ?? memberId,
+                                child: Container(
+                                width: 96, height: 96,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: verticalColor, width: 2.5),
+                                ),
+                                child: ClipOval(
+                                  child: m['headshot_url'] != null
+                                      ? CachedNetworkImage(
+                                          imageUrl: m['headshot_url'] as String,
+                                          fit: BoxFit.cover)
+                                      : Container(
+                                          color: AppColors.surfaceAlt,
+                                          child: Center(
+                                            child: Text(
+                                              initials.isEmpty ? '?' : initials,
+                                              style: TextStyle(fontSize: 34, fontWeight: FontWeight.bold, color: verticalColor),
+                                            ),
+                                          ),
+                                        ),
+                                ),
                               ),
+                              ),  // Hero
                             ),
                             const SizedBox(height: 12),
                             Text(
@@ -438,4 +456,38 @@ class MemberDetailScreen extends StatelessWidget {
         ),
         child: Text(label, style: TextStyle(color: color, fontSize: 12)),
       );
+}
+
+class _PhotoPreview extends StatelessWidget {
+  final String url;
+  const _PhotoPreview({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: PhotoView(
+              imageProvider: CachedNetworkImageProvider(url),
+              minScale: PhotoViewComputedScale.contained,
+              maxScale: PhotoViewComputedScale.covered * 3,
+              backgroundDecoration: const BoxDecoration(color: Colors.black),
+              heroAttributes: PhotoViewHeroAttributes(tag: url, transitionOnUserGestures: true),
+            ),
+          ),
+          SafeArea(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }

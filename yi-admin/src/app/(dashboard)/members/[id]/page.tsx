@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LinkButton } from '@/components/ui/link-button'
-import { ArrowLeft, Mail, Phone, MapPin, Briefcase, Building2, Globe, Linkedin, Instagram, Twitter, Facebook, Heart, Tag, Users } from 'lucide-react'
+import { ArrowLeft, Pencil, Mail, Phone, MapPin, Briefcase, Building2, Globe, Linkedin, Instagram, Twitter, Facebook, Heart, Tag, Users } from 'lucide-react'
 import { format } from 'date-fns'
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
@@ -61,12 +61,16 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
         <LinkButton href="/members" variant="ghost" size="sm" className="h-8 w-8 p-0">
           <ArrowLeft className="w-4 h-4" />
         </LinkButton>
-        <div>
+        <div className="flex-1">
           <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
             {member.member_type.replace('_', ' ')} · Joined {format(new Date(member.created_at), 'MMM d, yyyy')}
           </p>
         </div>
+        <LinkButton href={`/members/${id}/edit`} variant="outline" size="sm" className="gap-2">
+          <Pencil className="w-3.5 h-3.5" />
+          Edit
+        </LinkButton>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
