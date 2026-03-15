@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -14,6 +15,75 @@ import {
 import { toast } from 'sonner'
 import { DatePicker } from '@/components/ui/date-picker'
 import type { Profile } from '@/types/database.types'
+
+// ── Constants (mirrors app_constants.dart) ────────────────────────────────────
+
+const VERTICALS = [
+  { value: 'none',              label: 'None (General Member)' },
+  { value: 'yuva',              label: 'YUVA' },
+  { value: 'thalir',            label: 'THALIR' },
+  { value: 'rural_initiatives', label: 'Rural Initiatives' },
+  { value: 'masoom',            label: 'MASOOM' },
+  { value: 'road_safety',       label: 'Road Safety' },
+  { value: 'health',            label: 'Health' },
+  { value: 'accessibility',     label: 'Accessibility' },
+  { value: 'climate_change',    label: 'Climate Change' },
+  { value: 'entrepreneurship',  label: 'Entrepreneurship' },
+  { value: 'innovation',        label: 'Innovation' },
+  { value: 'learning',          label: 'Learning' },
+  { value: 'branding',          label: 'Branding' },
+]
+
+const POSITIONS = [
+  { value: 'none',        label: 'None' },
+  { value: 'chair',       label: 'Chair' },
+  { value: 'co_chair',    label: 'Co-Chair' },
+  { value: 'joint_chair', label: 'Joint Chair' },
+  { value: 'ec_member',   label: 'EC Member' },
+  { value: 'mentor',      label: 'Mentor' },
+]
+
+const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+
+const INDUSTRIES = [
+  'Agriculture', 'Automotive', 'Banking & Finance',
+  'Construction & Real Estate', 'Consumer Goods', 'Defence', 'Education',
+  'Energy & Utilities', 'Entertainment & Media', 'Food & Beverage',
+  'Government & Public Sector', 'Healthcare & Pharma', 'Hospitality & Tourism',
+  'Information Technology', 'Insurance', 'Legal & Compliance',
+  'Logistics & Supply Chain', 'Manufacturing', 'NGO & Social Sector',
+  'Retail', 'Sports & Fitness', 'Telecommunications', 'Textiles & Apparel', 'Other',
+]
+
+const COUNTRIES = [
+  'India', 'United States', 'United Kingdom', 'Australia', 'UAE',
+  'Singapore', 'Malaysia', 'Canada', 'Germany', 'France',
+  'Japan', 'China', 'South Africa', 'Brazil', 'Russia', 'Other',
+]
+
+const INDIAN_STATES = [
+  'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+  'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+  'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+  'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+  'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+  'Andaman and Nicobar Islands', 'Chandigarh',
+  'Dadra and Nagar Haveli and Daman & Diu', 'Delhi',
+  'Jammu & Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry',
+]
+
+const BUSINESS_TAGS = [
+  'Angel Investor', 'B2B', 'B2C', 'Bootstrapped', 'Co-Founder', 'Consultant',
+  'Exporter', 'Franchise', 'Manufacturer', 'Mentor', 'Product Company',
+  'Service Company', 'Social Entrepreneur', 'Startup', 'VC-Funded',
+]
+
+const HOBBY_TAGS = [
+  'Art & Craft', 'Chess', 'Cooking', 'Cricket', 'Cycling', 'Fitness & Gym',
+  'Gaming', 'Gardening', 'Hiking', 'Music', 'Photography', 'Reading', 'Travel', 'Yoga',
+]
+
+// ── Layout helpers ─────────────────────────────────────────────────────────────
 
 function FormSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -39,32 +109,82 @@ function Row({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">{children}</div>
 }
 
-const VERTICALS = [
-  { value: 'none', label: 'None' },
-  { value: 'innovation', label: 'Innovation' },
-  { value: 'climate_change', label: 'Climate Change' },
-  { value: 'yuva', label: 'Yuva' },
-  { value: 'thalir', label: 'Thalir' },
-  { value: 'masoom', label: 'Masoom' },
-  { value: 'branding', label: 'Branding' },
-  { value: 'learning', label: 'Learning' },
-  { value: 'road_safety', label: 'Road Safety' },
-  { value: 'accessibility', label: 'Accessibility' },
-  { value: 'health', label: 'Health' },
-  { value: 'rural_initiatives', label: 'Rural Initiatives' },
-  { value: 'entrepreneurship', label: 'Entrepreneurship' },
-]
+// ── Tag chips component ────────────────────────────────────────────────────────
 
-const POSITIONS = [
-  { value: 'none', label: 'None' },
-  { value: 'chair', label: 'Chair' },
-  { value: 'co_chair', label: 'Co-Chair' },
-  { value: 'joint_chair', label: 'Joint Chair' },
-  { value: 'ec_member', label: 'EC Member' },
-  { value: 'mentor', label: 'Mentor' },
-]
+function TagSelector({
+  label, predefined, selected, onToggle, onRemove, max = 4,
+}: {
+  label: string
+  predefined: string[]
+  selected: string[]
+  onToggle: (tag: string) => void
+  onRemove: (tag: string) => void
+  max?: number
+}) {
+  const [custom, setCustom] = useState('')
 
-const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
+  function addCustom() {
+    const t = custom.trim()
+    if (t && selected.length < max && !selected.includes(t)) {
+      onToggle(t)
+      setCustom('')
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium">{label}</Label>
+        <span className="text-xs text-muted-foreground">{selected.length}/{max}</span>
+      </div>
+
+      {/* Selected tags */}
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 mb-1">
+          {selected.map(tag => (
+            <span key={tag} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/15 text-green-600 border border-green-500/30">
+              {tag}
+              <button type="button" onClick={() => onRemove(tag)} className="hover:text-red-500">
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+
+      {/* Predefined chips */}
+      <div className="flex flex-wrap gap-1.5">
+        {predefined.filter(t => !selected.includes(t)).map(tag => (
+          <button
+            key={tag}
+            type="button"
+            disabled={selected.length >= max}
+            onClick={() => onToggle(tag)}
+            className="px-2.5 py-1 rounded-full text-xs border border-border hover:border-green-500 hover:text-green-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+
+      {/* Custom tag input */}
+      {selected.length < max && (
+        <div className="flex gap-2">
+          <Input
+            value={custom}
+            onChange={e => setCustom(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustom())}
+            placeholder="Add custom tag…"
+            className="h-8 text-sm"
+          />
+          <Button type="button" variant="outline" size="sm" onClick={addCustom}>Add</Button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ── Main form ─────────────────────────────────────────────────────────────────
 
 export function EditMemberForm({ member }: { member: Profile }) {
   const router = useRouter()
@@ -84,7 +204,7 @@ export function EditMemberForm({ member }: { member: Profile }) {
     address_line2: member.address_line2 ?? '',
     city: member.city ?? '',
     state: member.state ?? '',
-    country: member.country ?? '',
+    country: member.country ?? 'India',
     relationship_status: member.relationship_status ?? '',
     spouse_name: member.spouse_name ?? '',
     is_spouse_yi_member: member.is_spouse_yi_member == null ? '' : member.is_spouse_yi_member ? 'yes' : 'no',
@@ -95,18 +215,18 @@ export function EditMemberForm({ member }: { member: Profile }) {
     industry: member.industry ?? '',
     business_bio: member.business_bio ?? '',
     business_website: member.business_website ?? '',
-    business_tags: (member.business_tags ?? []).join(', '),
-    hobby_tags: (member.hobby_tags ?? []).join(', '),
     linkedin_url: member.linkedin_url ?? '',
     instagram_url: member.instagram_url ?? '',
     twitter_url: member.twitter_url ?? '',
     facebook_url: member.facebook_url ?? '',
-    member_type: member.member_type ?? 'member',
     yi_vertical: member.yi_vertical ?? 'none',
     yi_position: member.yi_position ?? 'none',
     yi_member_since: member.yi_member_since ? String(member.yi_member_since) : '',
     is_test_user: member.is_test_user ?? false,
   })
+
+  const [businessTags, setBusinessTags] = useState<string[]>(member.business_tags ?? [])
+  const [hobbyTags, setHobbyTags] = useState<string[]>(member.hobby_tags ?? [])
 
   function set(key: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -117,10 +237,21 @@ export function EditMemberForm({ member }: { member: Profile }) {
     return (val: string | null) => setForm(f => ({ ...f, [key]: val ?? '' }))
   }
 
+  // Auto-determine member_type from vertical/position
+  function derivedMemberType(vertical: string, position: string): string {
+    if (position !== 'none') return 'committee'
+    if (vertical !== 'none') return 'committee'
+    return 'member'
+  }
+
+  function toggleTag(arr: string[], tag: string, max: number): string[] {
+    if (arr.includes(tag)) return arr.filter(t => t !== tag)
+    if (arr.length >= max) return arr
+    return [...arr, tag]
+  }
+
   async function handleSave() {
     setSaving(true)
-    const parseTags = (s: string) =>
-      s.split(',').map(t => t.trim()).filter(Boolean)
 
     const body = {
       id: member.id,
@@ -148,13 +279,13 @@ export function EditMemberForm({ member }: { member: Profile }) {
       industry: form.industry || null,
       business_bio: form.business_bio || null,
       business_website: form.business_website || null,
-      business_tags: parseTags(form.business_tags),
-      hobby_tags: parseTags(form.hobby_tags),
+      business_tags: businessTags,
+      hobby_tags: hobbyTags,
       linkedin_url: form.linkedin_url || null,
       instagram_url: form.instagram_url || null,
       twitter_url: form.twitter_url || null,
       facebook_url: form.facebook_url || null,
-      member_type: form.member_type,
+      member_type: derivedMemberType(form.yi_vertical, form.yi_position),
       yi_vertical: form.yi_vertical,
       yi_position: form.yi_position,
       yi_member_since: form.yi_member_since ? parseInt(form.yi_member_since) : null,
@@ -179,8 +310,11 @@ export function EditMemberForm({ member }: { member: Profile }) {
     router.refresh()
   }
 
+  const isMarried = form.relationship_status === 'married'
+
   return (
     <div className="space-y-4 max-w-3xl">
+
       {/* Identity */}
       <FormSection title="Identity">
         <Row>
@@ -224,14 +358,10 @@ export function EditMemberForm({ member }: { member: Profile }) {
           </Field>
           <Field label="Blood Group">
             <Select value={form.blood_group} onValueChange={setSelect('blood_group')}>
-              <SelectTrigger className="bg-background border-border">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
+              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
                 <SelectItem value="">Not specified</SelectItem>
-                {BLOOD_GROUPS.map(bg => (
-                  <SelectItem key={bg} value={bg}>{bg}</SelectItem>
-                ))}
+                {BLOOD_GROUPS.map(bg => <SelectItem key={bg} value={bg}>{bg}</SelectItem>)}
               </SelectContent>
             </Select>
           </Field>
@@ -243,48 +373,64 @@ export function EditMemberForm({ member }: { member: Profile }) {
           <Input value={form.address_line2} onChange={set('address_line2')} placeholder="Apartment / Landmark" />
         </Field>
         <Row>
-          <Field label="City">
-            <Input value={form.city} onChange={set('city')} placeholder="City" />
+          <Field label="Country">
+            <Select value={form.country} onValueChange={v => setForm(f => ({ ...f, country: v ?? 'India', state: '' }))}>
+              <SelectTrigger><SelectValue placeholder="Select country" /></SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </Field>
           <Field label="State">
-            <Input value={form.state} onChange={set('state')} placeholder="State" />
+            {form.country === 'India' ? (
+              <Select value={form.state} onValueChange={setSelect('state')}>
+                <SelectTrigger><SelectValue placeholder="Select state" /></SelectTrigger>
+                <SelectContent>
+                  {INDIAN_STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input value={form.state} onChange={set('state')} placeholder="State / Province" />
+            )}
           </Field>
         </Row>
-        <Field label="Country">
-          <Input value={form.country} onChange={set('country')} placeholder="Country" />
+        <Field label="City">
+          <Input value={form.city} onChange={set('city')} placeholder="City" />
         </Field>
         <Row>
           <Field label="Relationship Status">
             <Select value={form.relationship_status} onValueChange={setSelect('relationship_status')}>
-              <SelectTrigger className="bg-background border-border">
-                <SelectValue placeholder="Select" />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
+              <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+              <SelectContent>
                 <SelectItem value="">Not specified</SelectItem>
                 <SelectItem value="single">Single</SelectItem>
                 <SelectItem value="married">Married</SelectItem>
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Spouse Name">
-            <Input value={form.spouse_name} onChange={set('spouse_name')} placeholder="Spouse name" />
-          </Field>
+          {isMarried && (
+            <Field label="Spouse Name">
+              <Input value={form.spouse_name} onChange={set('spouse_name')} placeholder="Spouse name" />
+            </Field>
+          )}
         </Row>
-        <Field label="Spouse is YI Member">
-          <Select value={form.is_spouse_yi_member} onValueChange={setSelect('is_spouse_yi_member')}>
-            <SelectTrigger className="bg-background border-border">
-              <SelectValue placeholder="Select" />
-            </SelectTrigger>
-            <SelectContent className="bg-card border-border">
-              <SelectItem value="">Not specified</SelectItem>
-              <SelectItem value="yes">Yes</SelectItem>
-              <SelectItem value="no">No</SelectItem>
-            </SelectContent>
-          </Select>
-        </Field>
-        <Field label="Anniversary Date">
-          <DatePicker date={form.anniversary_date} onDateChange={val => setForm(f => ({ ...f, anniversary_date: val }))} />
-        </Field>
+        {isMarried && (
+          <Row>
+            <Field label="Spouse is YI Member">
+              <Select value={form.is_spouse_yi_member} onValueChange={setSelect('is_spouse_yi_member')}>
+                <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Not specified</SelectItem>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </Field>
+            <Field label="Anniversary Date">
+              <DatePicker date={form.anniversary_date} onDateChange={val => setForm(f => ({ ...f, anniversary_date: val }))} />
+            </Field>
+          </Row>
+        )}
         <Field label="Personal Bio">
           <Textarea value={form.personal_bio} onChange={set('personal_bio')} placeholder="About the person..." rows={3} />
         </Field>
@@ -302,7 +448,13 @@ export function EditMemberForm({ member }: { member: Profile }) {
         </Row>
         <Row>
           <Field label="Industry">
-            <Input value={form.industry} onChange={set('industry')} placeholder="Industry" />
+            <Select value={form.industry} onValueChange={setSelect('industry')}>
+              <SelectTrigger><SelectValue placeholder="Select industry" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Not specified</SelectItem>
+                {INDUSTRIES.map(i => <SelectItem key={i} value={i}>{i}</SelectItem>)}
+              </SelectContent>
+            </Select>
           </Field>
           <Field label="Business Website">
             <Input value={form.business_website} onChange={set('business_website')} placeholder="https://" />
@@ -311,12 +463,20 @@ export function EditMemberForm({ member }: { member: Profile }) {
         <Field label="Business Bio">
           <Textarea value={form.business_bio} onChange={set('business_bio')} placeholder="About the business..." rows={3} />
         </Field>
-        <Field label="Business Tags (comma-separated)">
-          <Input value={form.business_tags} onChange={set('business_tags')} placeholder="Design, Marketing, Retail" />
-        </Field>
-        <Field label="Hobby Tags (comma-separated)">
-          <Input value={form.hobby_tags} onChange={set('hobby_tags')} placeholder="Cricket, Music, Travel" />
-        </Field>
+        <TagSelector
+          label="Business Tags (up to 4)"
+          predefined={BUSINESS_TAGS}
+          selected={businessTags}
+          onToggle={tag => setBusinessTags(prev => toggleTag(prev, tag, 4))}
+          onRemove={tag => setBusinessTags(prev => prev.filter(t => t !== tag))}
+        />
+        <TagSelector
+          label="Hobby Tags (up to 4)"
+          predefined={HOBBY_TAGS}
+          selected={hobbyTags}
+          onToggle={tag => setHobbyTags(prev => toggleTag(prev, tag, 4))}
+          onRemove={tag => setHobbyTags(prev => prev.filter(t => t !== tag))}
+        />
       </FormSection>
 
       {/* Social */}
@@ -338,51 +498,38 @@ export function EditMemberForm({ member }: { member: Profile }) {
       {/* Young Indians */}
       <FormSection title="Young Indians">
         <Row>
-          <Field label="Member Type">
-            <Select value={form.member_type} onValueChange={setSelect('member_type')}>
-              <SelectTrigger className="bg-background border-border">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                <SelectItem value="member">Member</SelectItem>
-                <SelectItem value="committee">Committee</SelectItem>
-                <SelectItem value="super_admin">Super Admin</SelectItem>
-              </SelectContent>
-            </Select>
-          </Field>
-          <Field label="Member Since (year)">
-            <Input value={form.yi_member_since} onChange={set('yi_member_since')} placeholder="2022" type="number" />
-          </Field>
-        </Row>
-        <Row>
           <Field label="Vertical">
-            <Select value={form.yi_vertical} onValueChange={setSelect('yi_vertical')}>
-              <SelectTrigger className="bg-background border-border">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                {VERTICALS.map(v => (
-                  <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>
-                ))}
+            <Select value={form.yi_vertical} onValueChange={v => setForm(f => ({
+              ...f,
+              yi_vertical: v ?? 'none',
+              yi_position: v === 'none' ? 'none' : f.yi_position,
+            }))}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {VERTICALS.map(v => <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Position">
-            <Select value={form.yi_position} onValueChange={setSelect('yi_position')}>
-              <SelectTrigger className="bg-background border-border">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="bg-card border-border">
-                {POSITIONS.map(p => (
-                  <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </Field>
+          {form.yi_vertical !== 'none' && (
+            <Field label="Position">
+              <Select value={form.yi_position} onValueChange={setSelect('yi_position')}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {POSITIONS.map(p => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
         </Row>
+        <Field label="Member Since (year)">
+          <Input value={form.yi_member_since} onChange={set('yi_member_since')} placeholder="2022" type="number" className="max-w-[160px]" />
+        </Field>
+        <p className="text-xs text-muted-foreground">
+          Member type is auto-determined: <strong>{derivedMemberType(form.yi_vertical, form.yi_position)}</strong>
+        </p>
       </FormSection>
 
-      {/* Test User */}
+      {/* Testing */}
       <FormSection title="Testing">
         <div className="flex items-center justify-between">
           <div>
