@@ -62,6 +62,7 @@ export interface Profile {
   // Legacy
   bio: string | null
   onboarding_done: boolean
+  is_test_user: boolean
   created_at: string
   updated_at: string
 }

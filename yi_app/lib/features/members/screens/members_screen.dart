@@ -49,7 +49,8 @@ class _MembersScreenState extends State<MembersScreen> {
           .from('profiles')
           .select('id, first_name, last_name, headshot_url, job_title, company_name, yi_vertical, yi_position, member_type, city, industry, phone, personal_bio, business_bio')
           .eq('onboarding_done', true)
-          .neq('member_type', 'super_admin');
+          .neq('member_type', 'super_admin')
+          .eq('is_test_user', false);
 
       if (_selectedIndustry != null) {
         query = query.eq('industry', _selectedIndustry!);
@@ -490,7 +491,8 @@ class _MembersFilterSheetState extends State<_MembersFilterSheet> {
     final data = await Supabase.instance.client
         .from('profiles')
         .select('business_tags, hobby_tags')
-        .eq('onboarding_done', true);
+        .eq('onboarding_done', true)
+        .eq('is_test_user', false);
     final bSet = <String>{};
     final hSet = <String>{};
     for (final row in data) {

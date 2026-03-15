@@ -105,6 +105,7 @@ export function EditMemberForm({ member }: { member: Profile }) {
     yi_vertical: member.yi_vertical ?? 'none',
     yi_position: member.yi_position ?? 'none',
     yi_member_since: member.yi_member_since ? String(member.yi_member_since) : '',
+    is_test_user: member.is_test_user ?? false,
   })
 
   function set(key: keyof typeof form) {
@@ -157,6 +158,7 @@ export function EditMemberForm({ member }: { member: Profile }) {
       yi_vertical: form.yi_vertical,
       yi_position: form.yi_position,
       yi_member_since: form.yi_member_since ? parseInt(form.yi_member_since) : null,
+      is_test_user: form.is_test_user,
     }
 
     const res = await fetch('/api/members', {
@@ -378,6 +380,23 @@ export function EditMemberForm({ member }: { member: Profile }) {
             </Select>
           </Field>
         </Row>
+      </FormSection>
+
+      {/* Test User */}
+      <FormSection title="Testing">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium">Test User</p>
+            <p className="text-xs text-muted-foreground">Hidden from the members list in the app</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setForm(f => ({ ...f, is_test_user: !f.is_test_user }))}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${form.is_test_user ? 'bg-green-500' : 'bg-muted'}`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${form.is_test_user ? 'translate-x-6' : 'translate-x-1'}`} />
+          </button>
+        </div>
       </FormSection>
 
       {/* Actions */}
