@@ -40,10 +40,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _cityCtrl     = TextEditingController();
 
   // ── Step 3: Professional Details ──────────────────────────────────────────
-  final _companyCtrl  = TextEditingController();
-  final _jobTitleCtrl = TextEditingController();
+  final _companyCtrl       = TextEditingController();
+  final _jobTitleCtrl      = TextEditingController();
   String? _industry;
-  final _businessBioCtrl = TextEditingController();
+  final _industryOtherCtrl = TextEditingController();
+  final _businessBioCtrl   = TextEditingController();
   final _businessWebCtrl = TextEditingController();
   String _yiVertical  = 'none';
   String _yiPosition  = 'none';
@@ -92,7 +93,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       _firstNameCtrl, _lastNameCtrl, _primaryEmailCtrl, _secondaryEmailCtrl,
       _primaryPhoneCtrl, _secondaryPhoneCtrl,
       _address1Ctrl, _address2Ctrl, _cityCtrl,
-      _companyCtrl, _jobTitleCtrl, _businessBioCtrl, _businessWebCtrl,
+      _companyCtrl, _jobTitleCtrl, _industryOtherCtrl, _businessBioCtrl, _businessWebCtrl,
       _memberSinceYearCtrl,
       _linkedinCtrl, _instagramCtrl, _twitterCtrl, _facebookCtrl,
       _personalBioCtrl, _spouseCtrl,
@@ -223,6 +224,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         'company_name':       _companyCtrl.text.trim().isEmpty ? null : _companyCtrl.text.trim(),
         'job_title':          _jobTitleCtrl.text.trim().isEmpty ? null : _jobTitleCtrl.text.trim(),
         'industry':           _industry,
+        'industry_other':     _industry == 'Other'
+            ? (_industryOtherCtrl.text.trim().isEmpty ? null : _industryOtherCtrl.text.trim())
+            : null,
         'business_bio':       _businessBioCtrl.text.trim().isEmpty ? null : _businessBioCtrl.text.trim(),
         'business_website':   _businessWebCtrl.text.trim().isEmpty ? null : _businessWebCtrl.text.trim(),
         'yi_vertical':        _yiVertical,
@@ -533,8 +537,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             placeholder: 'Select industry (optional)',
             items: AppConstants.industries.where((i) => i != 'N/A').toList(),
             itemLabel: (v) => v,
-            onChanged: (v) => setState(() => _industry = v),
+            onChanged: (v) => setState(() {
+              _industry = v;
+              if (v != 'Other') _industryOtherCtrl.clear();
+            }),
           ),
+          if (_industry == 'Other') ...[
+            const SizedBox(height: 10),
+            _buildTextField(_industryOtherCtrl, hint: 'Please specify your industry'),
+          ],
           const SizedBox(height: 16),
           _fieldLabel('Business Bio'),
           const SizedBox(height: 6),

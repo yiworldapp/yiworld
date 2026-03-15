@@ -45,6 +45,7 @@ export interface Profile {
   job_title: string | null
   company_name: string | null
   industry: string | null
+  industry_other: string | null
   business_bio: string | null
   business_website: string | null
   business_tags: string[] | null

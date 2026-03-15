@@ -42,10 +42,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _cityCtrl     = TextEditingController();
 
   // ── Professional ──────────────────────────────────────────────────────────
-  final _companyCtrl     = TextEditingController();
-  final _jobTitleCtrl    = TextEditingController();
+  final _companyCtrl       = TextEditingController();
+  final _jobTitleCtrl      = TextEditingController();
   String? _industry;
-  final _businessBioCtrl = TextEditingController();
+  final _industryOtherCtrl = TextEditingController();
+  final _businessBioCtrl   = TextEditingController();
   final _businessWebCtrl = TextEditingController();
   String _yiVertical     = 'none';
   String _yiPosition     = 'none';
@@ -81,7 +82,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _firstNameCtrl, _lastNameCtrl, _primaryEmailCtrl, _secondaryEmailCtrl,
       _primaryPhoneCtrl, _secondaryPhoneCtrl,
       _address1Ctrl, _address2Ctrl, _cityCtrl,
-      _companyCtrl, _jobTitleCtrl, _businessBioCtrl, _businessWebCtrl,
+      _companyCtrl, _jobTitleCtrl, _industryOtherCtrl, _businessBioCtrl, _businessWebCtrl,
       _memberSinceYearCtrl,
       _linkedinCtrl, _instagramCtrl, _twitterCtrl, _facebookCtrl,
       _personalBioCtrl, _spouseCtrl,
@@ -131,8 +132,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
       _companyCtrl.text     = data['company_name']     ?? '';
       _jobTitleCtrl.text    = data['job_title']        ?? '';
-      _industry             = data['industry']         as String?;
-      _businessBioCtrl.text = data['business_bio']     ?? '';
+      _industry                = data['industry']       as String?;
+      _industryOtherCtrl.text  = data['industry_other'] ?? '';
+      _businessBioCtrl.text    = data['business_bio']   ?? '';
       _businessWebCtrl.text = data['business_website'] ?? '';
       _yiVertical           = data['yi_vertical']      ?? 'none';
       _yiPosition           = data['yi_position']      ?? 'none';
@@ -202,6 +204,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'company_name':        _companyCtrl.text.trim().isEmpty         ? null : _companyCtrl.text.trim(),
         'job_title':           _jobTitleCtrl.text.trim().isEmpty        ? null : _jobTitleCtrl.text.trim(),
         'industry':            _industry,
+        'industry_other':      _industry == 'Other'
+            ? (_industryOtherCtrl.text.trim().isEmpty ? null : _industryOtherCtrl.text.trim())
+            : null,
         'business_bio':        _businessBioCtrl.text.trim().isEmpty     ? null : _businessBioCtrl.text.trim(),
         'business_website':    _businessWebCtrl.text.trim().isEmpty     ? null : _businessWebCtrl.text.trim(),
         'yi_vertical':         _yiVertical,
@@ -438,8 +443,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               placeholder: 'Select industry',
               items: AppConstants.industries.where((i) => i != 'N/A').toList(),
               label: (v) => v,
-              onChanged: (v) => setState(() => _industry = v),
+              onChanged: (v) => setState(() {
+                _industry = v;
+                if (v != 'Other') _industryOtherCtrl.clear();
+              }),
             ),
+            if (_industry == 'Other') ...[
+              const SizedBox(height: 10),
+              _textField(_industryOtherCtrl, hint: 'Please specify your industry'),
+            ],
             const SizedBox(height: 16),
             _field('Business Bio', _businessBioCtrl, hint: 'Brief description of your work', maxLines: 3),
             _field('Business Website', _businessWebCtrl, hint: 'https://example.com', type: TextInputType.url),

@@ -47,10 +47,10 @@ const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
 const INDUSTRIES = [
   'Agriculture', 'Automotive', 'Banking & Finance',
-  'Construction & Real Estate', 'Consumer Goods', 'Defence', 'Education',
-  'Energy & Utilities', 'Entertainment & Media', 'Food & Beverage',
+  'Construction & Real Estate', 'Consumer Goods', 'Defence', 'Design', 'Dentist',
+  'Education', 'Energy & Utilities', 'Entertainment & Media', 'Food & Beverage',
   'Government & Public Sector', 'Healthcare & Pharma', 'Hospitality & Tourism',
-  'Information Technology', 'Insurance', 'Legal & Compliance',
+  'Industrial Chemical', 'Information Technology', 'Insurance', 'Legal & Compliance',
   'Logistics & Supply Chain', 'Manufacturing', 'NGO & Social Sector',
   'Retail', 'Sports & Fitness', 'Telecommunications', 'Textiles & Apparel', 'Other',
 ]
@@ -213,6 +213,7 @@ export function EditMemberForm({ member }: { member: Profile }) {
     job_title: member.job_title ?? '',
     company_name: member.company_name ?? '',
     industry: member.industry ?? '',
+    industry_other: member.industry_other ?? '',
     business_bio: member.business_bio ?? '',
     business_website: member.business_website ?? '',
     linkedin_url: member.linkedin_url ?? '',
@@ -277,6 +278,7 @@ export function EditMemberForm({ member }: { member: Profile }) {
       job_title: form.job_title || null,
       company_name: form.company_name || null,
       industry: form.industry || null,
+      industry_other: form.industry === 'Other' ? form.industry_other || null : null,
       business_bio: form.business_bio || null,
       business_website: form.business_website || null,
       business_tags: businessTags,
@@ -313,7 +315,7 @@ export function EditMemberForm({ member }: { member: Profile }) {
   const isMarried = form.relationship_status === 'married'
 
   return (
-    <div className="space-y-4 max-w-3xl">
+    <div className="space-y-4 w-full">
 
       {/* Identity */}
       <FormSection title="Identity">
@@ -455,6 +457,14 @@ export function EditMemberForm({ member }: { member: Profile }) {
                 {INDUSTRIES.map(i => <SelectItem key={i} value={i}>{i}</SelectItem>)}
               </SelectContent>
             </Select>
+            {form.industry === 'Other' && (
+              <Input
+                className="mt-2"
+                value={form.industry_other}
+                onChange={set('industry_other')}
+                placeholder="Please specify your industry"
+              />
+            )}
           </Field>
           <Field label="Business Website">
             <Input value={form.business_website} onChange={set('business_website')} placeholder="https://" />
