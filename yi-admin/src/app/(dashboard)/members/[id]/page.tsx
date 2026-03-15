@@ -167,7 +167,7 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
             <Section title="Professional">
               <InfoRow label="Job Title" value={member.job_title} />
               <InfoRow label="Company" value={member.company_name} />
-              <InfoRow label="Industry" value={member.industry} />
+              <InfoRow label="Industry" value={member.industry === 'Other' && member.industry_other ? member.industry_other : member.industry} />
               <InfoRow label="Website" value={member.business_website} />
               {member.business_bio && (
                 <div className="pt-2">

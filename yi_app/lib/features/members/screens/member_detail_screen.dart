@@ -246,7 +246,11 @@ class MemberDetailScreen extends StatelessWidget {
                       _sectionHeader('Professional'),
                       _detailRow(Icons.work_outline, 'Job Title', s(m['job_title'] as String?)),
                       _detailRow(Icons.business_outlined, 'Company', s(m['company_name'] as String?)),
-                      _detailRow(Icons.category_outlined, 'Industry', s(m['industry'] as String?)),
+                      _detailRow(Icons.category_outlined, 'Industry', () {
+                        final ind = m['industry'] as String?;
+                        final other = m['industry_other'] as String?;
+                        return s(ind == 'Other' && (other ?? '').isNotEmpty ? other : ind);
+                      }()),
                       _detailRow(Icons.info_outline, 'About Business', s(m['business_bio'] as String?)),
                       _linkOrDash(Icons.link_outlined, 'Website', m['business_website'] as String?),
 

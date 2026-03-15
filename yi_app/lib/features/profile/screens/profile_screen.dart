@@ -211,7 +211,11 @@ class ProfileScreen extends StatelessWidget {
                         if ((p['company_name'] as String?)?.isNotEmpty == true)
                           _detailRow(Icons.business_outlined, 'Company', p['company_name'] as String),
                         if ((p['industry'] as String?)?.isNotEmpty == true)
-                          _detailRow(Icons.category_outlined, 'Industry', p['industry'] as String),
+                          _detailRow(Icons.category_outlined, 'Industry', () {
+                            final ind = p['industry'] as String?;
+                            final other = p['industry_other'] as String?;
+                            return (ind == 'Other' && (other ?? '').isNotEmpty) ? other! : ind!;
+                          }()),
                         if ((p['business_bio'] as String?)?.isNotEmpty == true)
                           _detailRow(Icons.info_outline, 'About Business', p['business_bio'] as String),
                         if ((p['business_website'] as String?)?.isNotEmpty == true)
