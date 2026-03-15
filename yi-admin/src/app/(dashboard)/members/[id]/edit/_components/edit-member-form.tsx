@@ -113,7 +113,7 @@ export function EditMemberForm({ member }: { member: Profile }) {
   }
 
   function setSelect(key: keyof typeof form) {
-    return (val: string) => setForm(f => ({ ...f, [key]: val }))
+    return (val: string | null) => setForm(f => ({ ...f, [key]: val ?? '' }))
   }
 
   async function handleSave() {
