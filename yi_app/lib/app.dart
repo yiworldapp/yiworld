@@ -15,6 +15,16 @@ class YIApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.darkTheme,
       routerConfig: router,
+      // On desktop/web: constrain to mobile width and center it
+      builder: (context, child) => ColoredBox(
+        color: const Color(0xFF0A0A0A),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: child!,
+          ),
+        ),
+      ),
     );
   }
 }

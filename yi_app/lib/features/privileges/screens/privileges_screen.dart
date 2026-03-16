@@ -14,22 +14,73 @@ class PrivilegesScreen extends StatefulWidget {
 
 class _PrivilegesScreenState extends State<PrivilegesScreen>
     with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+  TabController? _tabController;
+  bool _hasOnline = false;
+  bool _hasOffline = false;
+  bool _loaded = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _loadCounts();
+  }
+
+  Future<void> _loadCounts() async {
+    final supabase = Supabase.instance.client;
+    final results = await Future.wait([
+      supabase.from('online_offers').select('id').eq('is_active', true),
+      supabase.from('offline_offers').select('id').eq('is_active', true),
+    ]);
+    final hasOnline  = (results[0] as List).isNotEmpty;
+    final hasOffline = (results[1] as List).isNotEmpty;
+    final tabCount   = (hasOnline ? 1 : 0) + (hasOffline ? 1 : 0);
+
+    _tabController?.dispose();
+    setState(() {
+      _hasOnline  = hasOnline;
+      _hasOffline = hasOffline;
+      _loaded     = true;
+      if (tabCount > 0) {
+        _tabController = TabController(length: tabCount, vsync: this);
+      }
+    });
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    _tabController?.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_loaded) {
+      return Scaffold(
+        backgroundColor: AppColors.black,
+        appBar: AppBar(title: const Text('Privileges'), backgroundColor: AppColors.black),
+        body: const Center(child: CircularProgressIndicator(color: AppColors.green)),
+      );
+    }
+
+    // No data at all
+    if (!_hasOnline && !_hasOffline) {
+      return Scaffold(
+        backgroundColor: AppColors.black,
+        appBar: AppBar(title: const Text('Privileges'), backgroundColor: AppColors.black),
+        body: const _EmptyState(icon: Icons.card_giftcard_outlined, message: 'No privileges available'),
+      );
+    }
+
+    // Only one tab has data — show without tab bar
+    if (!_hasOnline || !_hasOffline) {
+      return Scaffold(
+        backgroundColor: AppColors.black,
+        appBar: AppBar(title: const Text('Privileges'), backgroundColor: AppColors.black),
+        body: _hasOnline ? const _OnlineTab() : const _OfflineTab(),
+      );
+    }
+
+    // Both tabs have data — show tab bar
     return Scaffold(
       backgroundColor: AppColors.black,
       appBar: AppBar(
@@ -48,7 +99,7 @@ class _PrivilegesScreenState extends State<PrivilegesScreen>
         ),
       ),
       body: TabBarView(
-        controller: _tabController,
+        controller: _tabController!,
         children: const [
           _OnlineTab(),
           _OfflineTab(),
@@ -299,11 +350,9 @@ class _OfflineOfferCard extends StatelessWidget {
                         ],
                       ),
                     ),
-                    _Badge(label: 'In-Store', color: AppColors.orange, icon: Icons.storefront_outlined),
                   ],
                 ),
                 const SizedBox(height: 10),
-                Text(offer['offer_description'] as String? ?? '', style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                 if (offer['discount_label'] != null) ...[
                   const SizedBox(height: 4),
                   Text(offer['discount_label'] as String,

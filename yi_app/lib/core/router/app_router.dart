@@ -19,6 +19,7 @@ import '../../features/chat/screens/chat_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
 import '../../features/profile/screens/change_phone_screen.dart';
+import '../../features/profile/screens/change_email_screen.dart';
 import '../../features/menu/screens/menu_screen.dart';
 import '../../features/menu/screens/mous_screen.dart';
 
@@ -76,7 +77,7 @@ GoRouter appRouter(AppRouterRef ref) {
         builder: (ctx, state) {
           final extra = state.extra as Map<String, dynamic>? ?? {};
           return OtpVerifyScreen(
-            phone: extra['phone'] as String? ?? '',
+            email: extra['email'] as String? ?? '',
             isSignUp: extra['isSignUp'] as bool? ?? false,
           );
         },
@@ -167,6 +168,11 @@ GoRouter appRouter(AppRouterRef ref) {
                 path: 'change-phone',
                 name: 'change-phone',
                 builder: (ctx, state) => const ChangePhoneScreen(),
+              ),
+              GoRoute(
+                path: 'change-email',
+                name: 'change-email',
+                builder: (ctx, state) => const ChangeEmailScreen(),
               ),
             ],
           ),

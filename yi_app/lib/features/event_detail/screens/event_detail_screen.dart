@@ -9,9 +9,8 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:video_player/video_player.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
-
 import '../../../core/services/verticals_cache.dart';
+import '../../../utils/video_thumb_helper.dart';
 import '../../../core/theme/app_colors.dart';
 
 class EventDetailScreen extends StatefulWidget {
@@ -762,12 +761,7 @@ class _VideoThumbnailState extends State<_VideoThumbnail> {
   }
 
   Future<void> _generate() async {
-    final bytes = await VideoThumbnail.thumbnailData(
-      video: widget.url,
-      imageFormat: ImageFormat.JPEG,
-      maxWidth: 220,
-      quality: 70,
-    );
+    final bytes = await getVideoThumbnail(widget.url);
     if (mounted && bytes != null) setState(() => _thumb = bytes);
   }
 

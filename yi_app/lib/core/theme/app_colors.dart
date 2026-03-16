@@ -9,13 +9,17 @@ class AppColors {
   static const Color surfaceAlt = Color(0xFF1A1A1A);
   static const Color card       = Color(0xFF141414);
 
-  // Brand
-  static const Color green      = Color(0xFF16A34A);
-  static const Color greenLight = Color(0xFF22C55E);
-  static const Color greenMuted = Color(0xFF166534);
+  // Brand — primary is orange, secondary green kept for badges/success
+  static const Color green      = Color(0xFFF97316); // primary action colour (orange)
+  static const Color greenLight = Color(0xFFFB923C); // lighter orange
+  static const Color greenMuted = Color(0xFFEA580C); // darker orange
 
   static const Color orange     = Color(0xFFF97316);
   static const Color orangeMuted= Color(0xFF9A3412);
+
+  // Keep real green for success states & vertical badges
+  static const Color accentGreen      = Color(0xFF16A34A);
+  static const Color accentGreenLight = Color(0xFF22C55E);
 
   static const Color yellow     = Color(0xFFEAB308);
   static const Color yellowMuted= Color(0xFF854D0E);
@@ -31,7 +35,7 @@ class AppColors {
 
   // Status
   static const Color error      = Color(0xFFEF4444);
-  static const Color success    = Color(0xFF22C55E);
+  static const Color success    = Color(0xFF16A34A);
   static const Color warning    = Color(0xFFF59E0B);
 
 }

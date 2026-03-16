@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -13,30 +12,45 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _phoneCtrl = TextEditingController();
-  final _phoneFocus = FocusNode();
+  final _emailCtrl = TextEditingController();
+  final _emailFocus = FocusNode();
   bool _loading = false;
   String _error = '';
 
   @override
   void dispose() {
-    _phoneCtrl.dispose();
-    _phoneFocus.dispose();
+    _emailCtrl.dispose();
+    _emailFocus.dispose();
     super.dispose();
   }
 
-  Future<void> _sendOtp(bool isSignUp) async {
-    final phone = '+91${_phoneCtrl.text.trim()}';
-    if (_phoneCtrl.text.trim().length != 10) {
-      setState(() => _error = 'Enter a valid 10-digit mobile number');
+  Future<void> _sendOtp() async {
+    final email = _emailCtrl.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      setState(() => _error = 'Enter a valid email address');
       return;
     }
     setState(() { _loading = true; _error = ''; });
 
-    try {
-      await Supabase.instance.client.auth.signInWithOtp(phone: phone);
+    // ── TEST ACCOUNT BYPASS ──────────────────────────────────────────────────
+    // Hardcoded reviewer account for Google Play Store review process.
+    // Entering this email skips sending a real OTP — the actual Supabase
+    // sign-in happens in otp_verify_screen via signInWithPassword when the
+    // hardcoded OTP "123456" is entered. Do not remove without updating
+    // Play Store test credentials in the developer console.
+    if (email == 'yiworldapp@gmail.com') {
       if (mounted) {
-        context.pushNamed('otp', extra: {'phone': phone, 'isSignUp': isSignUp});
+        setState(() => _loading = false);
+        context.pushNamed('otp', extra: {'email': email});
+      }
+      return;
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
+    try {
+      await Supabase.instance.client.auth.signInWithOtp(email: email);
+      if (mounted) {
+        context.pushNamed('otp', extra: {'email': email});
       }
     } catch (e) {
       setState(() => _error = e.toString());
@@ -81,62 +95,43 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Enter your mobile number to continue',
+                'Enter your email address to continue',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textMuted),
               ),
               const SizedBox(height: 48),
 
-              // Phone input
-              Text('Mobile Number', style: Theme.of(context).textTheme.labelLarge),
+              // Email input
+              Text('Email Address', style: Theme.of(context).textTheme.labelLarge),
               const SizedBox(height: 8),
               ListenableBuilder(
-                listenable: _phoneFocus,
+                listenable: _emailFocus,
                 builder: (context, _) => Container(
                   decoration: BoxDecoration(
                     color: AppColors.surfaceAlt,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: _phoneFocus.hasFocus ? AppColors.green : AppColors.border,
-                      width: _phoneFocus.hasFocus ? 1.5 : 1,
+                      color: _emailFocus.hasFocus ? AppColors.green : AppColors.border,
+                      width: _emailFocus.hasFocus ? 1.5 : 1,
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(left: 16),
-                        child: Text(
-                          '+91',
-                          style: TextStyle(
-                            fontSize: 16, color: AppColors.textMuted,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: TextField(
-                          focusNode: _phoneFocus,
-                          controller: _phoneCtrl,
-                          keyboardType: TextInputType.phone,
-                          inputFormatters: [
-                            FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
-                          ],
-                          style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600,
-                            color: AppColors.white, letterSpacing: 2,
-                          ),
-                          decoration: const InputDecoration(
-                            hintText: '98765 43210',
-                            hintStyle: TextStyle(color: AppColors.textHint, letterSpacing: 2),
-                            border: InputBorder.none,
-                            enabledBorder: InputBorder.none,
-                            focusedBorder: InputBorder.none,
-                            filled: false,
-                            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 18),
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: TextField(
+                    focusNode: _emailFocus,
+                    controller: _emailCtrl,
+                    keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
+                    style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500,
+                      color: AppColors.white,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: 'you@example.com',
+                      hintStyle: TextStyle(color: AppColors.textHint),
+                      border: InputBorder.none,
+                      enabledBorder: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      filled: false,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                    ),
                   ),
                 ),
               ),
@@ -164,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: _loading ? null : () => _sendOtp(false),
+                  onPressed: _loading ? null : _sendOtp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.green,
                     disabledBackgroundColor: AppColors.green.withOpacity(0.5),
@@ -182,7 +177,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                 ),
               ),
-
             ],
           ),
         ),

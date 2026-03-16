@@ -6,10 +6,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 
 class OtpVerifyScreen extends StatefulWidget {
-  final String phone;
+  final String email;
   final bool isSignUp;
 
-  const OtpVerifyScreen({super.key, required this.phone, required this.isSignUp});
+  const OtpVerifyScreen({super.key, required this.email, this.isSignUp = false});
 
   @override
   State<OtpVerifyScreen> createState() => _OtpVerifyScreenState();
@@ -18,21 +18,41 @@ class OtpVerifyScreen extends StatefulWidget {
 class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
   bool _loading = false;
   String _error = '';
-  String _otp = '';
 
   Future<void> _verifyOtp(String otp) async {
     if (otp.length != 6) return;
     setState(() { _loading = true; _error = ''; });
 
+    // ── TEST ACCOUNT BYPASS ──────────────────────────────────────────────────
+    // If this is the hardcoded reviewer account (for Google Play Store review),
+    // sign in using password auth instead of OTP. The hardcoded OTP "123456"
+    // acts as the trigger — real auth still happens via Supabase session so
+    // all route guards pass normally. We skip the profile/onboarding check
+    // and go straight to events since this is a pre-seeded test account.
+    if (widget.email == 'yiworldapp@gmail.com' && otp == '123456') {
+      try {
+        await Supabase.instance.client.auth.signInWithPassword(
+          email: 'yiworldapp@gmail.com',
+          password: '1234567890',
+        );
+        if (mounted) context.go('/events');
+      } catch (e) {
+        setState(() => _error = 'Test account sign-in failed. Please contact the developer.');
+      } finally {
+        if (mounted) setState(() => _loading = false);
+      }
+      return;
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     try {
       final response = await Supabase.instance.client.auth.verifyOTP(
-        phone: widget.phone,
+        email: widget.email,
         token: otp,
-        type: OtpType.sms,
+        type: OtpType.email,
       );
 
       if (response.session != null && mounted) {
-        // Check onboarding
         final userId = response.session!.user.id;
         final profile = await Supabase.instance.client
             .from('profiles')
@@ -92,7 +112,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'We sent a 6-digit OTP to ${widget.phone}',
+                'We sent a 6-digit OTP to ${widget.email}',
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.textMuted),
               ),
               const SizedBox(height: 48),
@@ -111,7 +131,6 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
                   ),
                 ),
                 onCompleted: _verifyOtp,
-                onChanged: (val) => setState(() => _otp = val),
                 autofocus: true,
                 cursor: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -147,7 +166,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
               Center(
                 child: TextButton(
                   onPressed: () async {
-                    await Supabase.instance.client.auth.signInWithOtp(phone: widget.phone);
+                    await Supabase.instance.client.auth.signInWithOtp(email: widget.email);
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('OTP resent')),

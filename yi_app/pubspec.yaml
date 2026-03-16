@@ -64,10 +64,11 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/images/yi_icon_padded.png"
+  image_path: "assets/images/yi_logo.png"
   remove_alpha_ios: true
   adaptive_icon_background: "#FFFFFF"
-  adaptive_icon_foreground: "assets/images/yi_icon_padded.png"
+  adaptive_icon_foreground: "assets/images/yi_logo.png"
+  adaptive_icon_foreground_scale: 0.5
 
 flutter:
   uses-material-design: true

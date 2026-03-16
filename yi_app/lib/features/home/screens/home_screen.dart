@@ -200,11 +200,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Text(
                       'Young Indians',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.white, height: 1.2),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.orange, height: 1.2),
                     ),
                     Text(
                       'YI Kanpur Chapter',
-                      style: TextStyle(fontSize: 10, color: AppColors.textMuted, height: 1.2),
+                      style: TextStyle(fontSize: 10, color: AppColors.accentGreen, height: 1.2),
                     ),
                   ],
                 ),

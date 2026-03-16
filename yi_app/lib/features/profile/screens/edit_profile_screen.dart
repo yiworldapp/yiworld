@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -20,7 +20,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   final _picker   = ImagePicker();
   bool _loading   = true;
   bool _saving    = false;
-  File? _newHeadshot;
+  Uint8List? _newHeadshotBytes;
   String? _existingHeadshotUrl;
 
   // ── Identity & Contact ────────────────────────────────────────────────────
@@ -176,14 +176,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final userId = _supabase.auth.currentUser!.id;
       String? headshotUrl = _existingHeadshotUrl;
-      if (_newHeadshot != null) {
+      if (_newHeadshotBytes != null) {
         final path   = '$userId/avatar.jpg';
-        await _supabase.storage.from('avatars').upload(
-          path, _newHeadshot!,
+        await _supabase.storage.from('avatars').uploadBinary(
+          path, _newHeadshotBytes!,
           fileOptions: const FileOptions(upsert: true, contentType: 'image/jpeg'),
         );
         headshotUrl = _supabase.storage.from('avatars').getPublicUrl(path);
       }
+
+      final primaryPhoneRaw = _primaryPhoneCtrl.text.trim();
+      final primaryPhoneFull = primaryPhoneRaw.isEmpty ? null : '$_countryCode$primaryPhoneRaw';
 
       await _supabase.from('profiles').upsert({
         'id':                  userId,
@@ -191,6 +194,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'last_name':           _lastNameCtrl.text.trim().isEmpty        ? null : _lastNameCtrl.text.trim(),
         'primary_email':       _primaryEmailCtrl.text.trim().isEmpty    ? null : _primaryEmailCtrl.text.trim(),
         'secondary_email':     _secondaryEmailCtrl.text.trim().isEmpty  ? null : _secondaryEmailCtrl.text.trim(),
+        'phone':                        primaryPhoneFull,
         'phone_country_code':           _countryCode,
         'secondary_phone_country_code': _secondaryCountryCode,
         'secondary_phone':              _secondaryPhoneCtrl.text.trim().isEmpty ? null : _secondaryPhoneCtrl.text.trim(),
@@ -281,7 +285,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: GestureDetector(
                 onTap: () async {
                   final file = await _picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
-                  if (file != null) setState(() => _newHeadshot = File(file.path));
+                  if (file != null) {
+                    final bytes = await file.readAsBytes();
+                    setState(() => _newHeadshotBytes = bytes);
+                  }
                 },
                 child: Stack(
                   children: [
@@ -292,8 +299,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         border: Border.all(color: AppColors.green, width: 2),
                       ),
                       child: ClipOval(
-                        child: _newHeadshot != null
-                            ? Image.file(_newHeadshot!, fit: BoxFit.cover)
+                        child: _newHeadshotBytes != null
+                            ? Image.memory(_newHeadshotBytes!, fit: BoxFit.cover)
                             : _existingHeadshotUrl != null
                                 ? Image.network(_existingHeadshotUrl!, fit: BoxFit.cover)
                                 : Container(
@@ -331,28 +338,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(width: 12),
               Expanded(child: _field('Last Name *', _lastNameCtrl)),
             ]),
-            _field('Primary Email', _primaryEmailCtrl, type: TextInputType.emailAddress),
-            _field('Secondary Email', _secondaryEmailCtrl, type: TextInputType.emailAddress),
+
+            // Primary email is auth identity — read-only with Change button
             Row(children: [
-              _label('Primary Phone (WhatsApp)'),
+              _label('Primary Email'),
               const Spacer(),
               TextButton(
                 onPressed: () async {
-                  final changed = await context.push<bool>('/profile/edit/change-phone');
+                  final changed = await context.push<bool>('/profile/edit/change-email');
                   if (changed == true) {
-                    // Reload the phone from auth
-                    final authPhone = _supabase.auth.currentUser?.phone ?? '';
-                    setState(() {
-                      if (authPhone.startsWith('+91')) {
-                        _countryCode = '+91';
-                        _primaryPhoneCtrl.text = authPhone.substring(3);
-                      } else if (authPhone.startsWith('91') && authPhone.length >= 12) {
-                        _countryCode = '+91';
-                        _primaryPhoneCtrl.text = authPhone.substring(2);
-                      } else {
-                        _primaryPhoneCtrl.text = authPhone;
-                      }
-                    });
+                    setState(() => _loading = true);
+                    await _loadProfile(); // reload entire profile to stay in sync
                   }
                 },
                 style: TextButton.styleFrom(
@@ -364,14 +360,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ]),
             const SizedBox(height: 6),
+            _textField(_primaryEmailCtrl, hint: 'Primary Email', type: TextInputType.emailAddress, readOnly: true),
+            const SizedBox(height: 16),
+
+            _field('Secondary Email', _secondaryEmailCtrl, type: TextInputType.emailAddress),
+
+            _label('Primary Phone (WhatsApp)'),
+            const SizedBox(height: 6),
             IntrinsicHeight(
               child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                 _countryCodePicker(
                   value: _countryCode,
-                  onChanged: null, // read-only — use Change button above
+                  onChanged: (v) => setState(() => _countryCode = v),
                 ),
                 const SizedBox(width: 8),
-                Expanded(child: _textField(_primaryPhoneCtrl, hint: 'Phone number', type: TextInputType.phone, readOnly: true)),
+                Expanded(child: _textField(_primaryPhoneCtrl, hint: 'Phone number', type: TextInputType.phone)),
               ]),
             ),
             const SizedBox(height: 16),
@@ -613,14 +616,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: AppColors.textMuted));
 
   Widget _field(String label, TextEditingController ctrl, {
-    String? hint, TextInputType? type, int maxLines = 1,
+    String? hint, TextInputType? type, int maxLines = 1, bool readOnly = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _label(label),
         const SizedBox(height: 6),
-        _textField(ctrl, hint: hint ?? label, type: type, maxLines: maxLines),
+        _textField(ctrl, hint: hint ?? label, type: type, maxLines: maxLines, readOnly: readOnly),
         const SizedBox(height: 16),
       ],
     );
