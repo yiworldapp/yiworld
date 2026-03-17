@@ -255,7 +255,7 @@ export function EventForm({ event, verticals, committeeMembers }: EventFormProps
               <CardTitle className="text-base font-semibold">Photo Gallery</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {existingGallery.length > 0 && (
+              {(existingGallery.length > 0 || galleryFiles.length > 0) && (
                 <div className="grid grid-cols-4 gap-2">
                   {existingGallery.map(item => (
                     <div key={item.id} className="relative rounded-lg overflow-hidden aspect-square bg-muted">
@@ -273,29 +273,11 @@ export function EventForm({ event, verticals, committeeMembers }: EventFormProps
                       </button>
                     </div>
                   ))}
-                </div>
-              )}
-              <div className="space-y-1.5">
-                <Label className="text-sm font-medium">Add Photos / Videos</Label>
-                <Input
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={e => {
-                    const files = Array.from(e.target.files || [])
-                    setGalleryFiles(files.slice(0, 10 - existingGallery.length))
-                  }}
-                  className="h-10 cursor-pointer"
-                />
-                <p className="text-xs text-muted-foreground">{10 - existingGallery.length} of 10 slots remaining</p>
-              </div>
-              {galleryFiles.length > 0 && (
-                <div className="grid grid-cols-4 gap-2">
                   {galleryFiles.map((file, i) => {
                     const url = URL.createObjectURL(file)
                     const isVideo = file.type.startsWith('video/')
                     return (
-                      <div key={i} className="relative rounded-lg overflow-hidden aspect-square bg-muted">
+                      <div key={`new-${i}`} className="relative rounded-lg overflow-hidden aspect-square bg-muted">
                         {isVideo ? (
                           <video src={url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
                         ) : (
@@ -313,6 +295,32 @@ export function EventForm({ event, verticals, committeeMembers }: EventFormProps
                   })}
                 </div>
               )}
+              {(() => {
+                const slotsUsed = existingGallery.length + galleryFiles.length
+                const slotsLeft = 10 - slotsUsed
+                return slotsLeft > 0 ? (
+                  <div className="space-y-1.5">
+                    <Label className="text-sm font-medium">Add Photos / Videos</Label>
+                    <Input
+                      type="file"
+                      accept="image/*,video/*"
+                      multiple
+                      onChange={e => {
+                        const newFiles = Array.from(e.target.files || [])
+                        setGalleryFiles(prev => {
+                          const combined = [...prev, ...newFiles]
+                          return combined.slice(0, 10 - existingGallery.length)
+                        })
+                        e.target.value = ''
+                      }}
+                      className="h-10 cursor-pointer"
+                    />
+                    <p className="text-xs text-muted-foreground">{slotsLeft} of 10 slots remaining</p>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Gallery full (10/10). Remove items to add more.</p>
+                )
+              })()}
             </CardContent>
           </Card>
 
