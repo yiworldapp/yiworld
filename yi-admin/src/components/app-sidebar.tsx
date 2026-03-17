@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
-import { Calendar, Users, FileText, Gem, LogOut, ShieldCheck } from 'lucide-react'
+import { Calendar, Users, FileText, Gem, LogOut, ShieldCheck, Mail } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { AdminUser } from '@/types/database.types'
 import { cn } from '@/lib/utils'
@@ -13,7 +13,8 @@ const navItems = [
   { key: 'members',      href: '/members',      label: 'Members',      icon: Users       },
   { key: 'admin-users',  href: '/admin-users',  label: 'Admin Users',  icon: ShieldCheck },
   { key: 'mou',          href: '/mou',          label: 'MOUs',         icon: FileText    },
-  { key: 'privileges',   href: '/privileges',   label: 'Privileges',   icon: Gem         },
+  { key: 'privileges',          href: '/privileges',          label: 'Privileges',    icon: Gem   },
+  { key: 'organisation-emails', href: '/organisation-emails', label: 'Org Emails',    icon: Mail  },
 ]
 
 export function AppSidebar({ profile }: { profile: AdminUser }) {

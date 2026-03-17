@@ -67,15 +67,31 @@ class _MembersScreenState extends State<MembersScreen> {
         );
       }
 
+      // On first page, fetch total count via a lightweight ID-only query
+      if (pageKey == 0) {
+        var countQuery = _supabase
+            .from('profiles')
+            .select('id')
+            .eq('onboarding_done', true)
+            .neq('member_type', 'super_admin')
+            .eq('is_test_user', false);
+        if (_selectedIndustry != null) countQuery = countQuery.eq('industry', _selectedIndustry!);
+        if (_selectedBusinessTag != null) countQuery = countQuery.contains('business_tags', [_selectedBusinessTag!]);
+        if (_selectedHobbyTag != null) countQuery = countQuery.contains('hobby_tags', [_selectedHobbyTag!]);
+        if (_search.isNotEmpty) {
+          countQuery = countQuery.or(
+            'first_name.ilike.%$_search%,last_name.ilike.%$_search%,personal_bio.ilike.%$_search%,business_bio.ilike.%$_search%,job_title.ilike.%$_search%,company_name.ilike.%$_search%,industry.ilike.%$_search%',
+          );
+        }
+        final countData = await countQuery;
+        if (mounted) setState(() => _totalCount = (countData as List).length);
+      }
+
       final data = List<Map<String, dynamic>>.from(
         await query.order('first_name').range(pageKey, pageKey + _pageSize - 1),
       );
-      if (pageKey == 0) {
-        setState(() => _totalCount = data.length < _pageSize ? data.length : _pageSize);
-      }
       final isLast = data.length < _pageSize;
       if (isLast) {
-        if (pageKey == 0) setState(() => _totalCount = data.length);
         _pagingController.appendLastPage(data);
       } else {
         _pagingController.appendPage(data, pageKey + _pageSize);

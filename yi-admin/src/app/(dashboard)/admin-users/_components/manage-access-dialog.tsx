@@ -11,7 +11,8 @@ const ALL_PAGES = [
   { key: 'events',      label: 'Events' },
   { key: 'members',     label: 'Members' },
   { key: 'mou',         label: 'MOUs' },
-  { key: 'privileges',  label: 'Privileges' },
+  { key: 'privileges',          label: 'Privileges' },
+  { key: 'organisation-emails', label: 'Org Emails' },
 ]
 
 export function ManageAccessDialog({ admin, open, onClose }: {

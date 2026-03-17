@@ -58,6 +58,7 @@ export async function middleware(request: NextRequest) {
         '/mou': 'mou',
         '/privileges': 'privileges',
         '/admin-users': 'admin-users',
+        '/organisation-emails': 'organisation-emails',
       }
       for (const [route, perm] of Object.entries(routePermMap)) {
         if (request.nextUrl.pathname.startsWith(route) && !perms.includes(perm)) {

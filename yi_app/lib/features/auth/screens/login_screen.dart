@@ -47,6 +47,29 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     // ────────────────────────────────────────────────────────────────────────
 
+    // ── ORGANISATION WHITELIST CHECK ─────────────────────────────────────────
+    // Only emails listed in the organisation_emails table are permitted.
+    // This check runs after the test account bypass above.
+    try {
+      final allowed = await Supabase.instance.client
+          .from('organisation_emails')
+          .select('email')
+          .eq('email', email)
+          .maybeSingle();
+
+      if (allowed == null) {
+        setState(() {
+          _error = 'This app is only for Young Indians organisation members. Please contact your chapter coordinator.';
+          _loading = false;
+        });
+        return;
+      }
+    } catch (e) {
+      setState(() { _error = 'Unable to verify membership. Please try again.'; _loading = false; });
+      return;
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     try {
       await Supabase.instance.client.auth.signInWithOtp(email: email);
       if (mounted) {

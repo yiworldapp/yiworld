@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
   }
 
-  const validPermissions = ['events', 'members', 'mou', 'privileges', 'admin-users']
+  const validPermissions = ['events', 'members', 'mou', 'privileges', 'admin-users', 'organisation-emails']
   if (permissions !== undefined) {
     if (!Array.isArray(permissions) || !permissions.every((p: unknown) => validPermissions.includes(p as string))) {
       return NextResponse.json({ error: 'Invalid permissions' }, { status: 400 })
