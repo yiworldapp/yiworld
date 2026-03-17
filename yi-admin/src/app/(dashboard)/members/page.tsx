@@ -96,7 +96,7 @@ export default async function MembersPage({
                       </Badge>
                     </td>
                     <td className="py-3 px-4 hidden lg:table-cell">
-                      {member.yi_vertical ? (
+                      {member.yi_vertical && member.yi_vertical !== 'none' ? (
                         <Badge variant="outline" className="text-xs" style={verticalBadgeStyle(member.yi_vertical)}>
                           {verticalLabel(member.yi_vertical)}
                         </Badge>
