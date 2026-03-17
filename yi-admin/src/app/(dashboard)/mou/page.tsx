@@ -32,7 +32,7 @@ export default async function MOUPage({ searchParams }: { searchParams: Promise<
           <h1 className="text-2xl font-bold tracking-tight">MOUs</h1>
           <p className="text-muted-foreground text-sm mt-1">Memorandum of Understanding</p>
         </div>
-        <MOUUploadDialog userId={user!.id} />
+        <MOUUploadDialog />
       </div>
 
       {/* Tag filter chips */}

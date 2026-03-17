@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { deleteEvent } from '../actions'
 import { Button, buttonVariants } from '@/components/ui/button'
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter,
@@ -16,17 +16,16 @@ export function DeleteEventButton({ eventId, eventTitle }: { eventId: string; ev
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   async function handleDelete() {
     setLoading(true)
-    const { error } = await supabase.from('events').delete().eq('id', eventId)
-    if (error) {
-      toast.error('Failed to delete event')
-    } else {
+    try {
+      await deleteEvent(eventId)
       toast.success('Event deleted')
       setOpen(false)
       router.refresh()
+    } catch {
+      toast.error('Failed to delete event')
     }
     setLoading(false)
   }

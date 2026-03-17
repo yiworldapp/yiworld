@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { insertMOU } from '../actions'
+import { uploadToStorage } from '../../upload-actions'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,9 +16,8 @@ import { cn } from '@/lib/utils'
 
 const MOU_TAGS = ['institute', 'school', 'organisation'] as const
 
-export function MOUUploadDialog({ userId }: { userId: string }) {
+export function MOUUploadDialog() {
   const router = useRouter()
-  const supabase = createClient()
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const [name, setName] = useState('')
@@ -39,21 +39,18 @@ export function MOUUploadDialog({ userId }: { userId: string }) {
     setLoading(true)
 
     try {
-      const filePath = `mous/${Date.now()}-${file.name}`
-      const { error: uploadError } = await supabase.storage
-        .from('mou-pdfs').upload(filePath, file)
-      if (uploadError) throw uploadError
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('bucket', 'mou-pdfs')
+      fd.append('path', `mous/${Date.now()}-${file.name}`)
+      const publicUrl = await uploadToStorage(fd)
 
-      const { data: { publicUrl } } = supabase.storage.from('mou-pdfs').getPublicUrl(filePath)
-
-      const { error } = await supabase.from('mous').insert({
+      await insertMOU({
         title: name.trim(),
         description: description.trim() || null,
         tag,
         pdf_url: publicUrl,
-        created_by: userId,
       })
-      if (error) throw error
 
       toast.success('MOU added successfully')
       setOpen(false)

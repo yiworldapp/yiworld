@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { upsertPartner } from '../../actions'
+import { uploadToStorage } from '../../../upload-actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +16,6 @@ import type { Partner } from '@/types/database.types'
 
 export function PartnerForm({ partner }: { partner?: Partner }) {
   const router = useRouter()
-  const supabase = createClient()
   const isEdit = !!partner
 
   const [loading, setLoading] = useState(false)
@@ -34,10 +34,11 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
     try {
       let logoUrl = partner?.logo_url || null
       if (logoFile) {
-        const path = `partner-logos/${Date.now()}-${logoFile.name}`
-        const { error: uploadError } = await supabase.storage.from('partner-logos').upload(path, logoFile, { upsert: true })
-        if (uploadError) throw uploadError
-        logoUrl = supabase.storage.from('partner-logos').getPublicUrl(path).data.publicUrl
+        const fd = new FormData()
+        fd.append('file', logoFile)
+        fd.append('bucket', 'partner-logos')
+        fd.append('path', `partner-logos/${Date.now()}-${logoFile.name}`)
+        logoUrl = await uploadToStorage(fd)
       }
 
       const data = {
@@ -46,13 +47,7 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
         logo_url: logoUrl, is_active: isActive,
       }
 
-      if (isEdit) {
-        const { error } = await supabase.from('partners').update(data).eq('id', partner!.id)
-        if (error) throw error
-      } else {
-        const { error } = await supabase.from('partners').insert(data)
-        if (error) throw error
-      }
+      await upsertPartner(data, isEdit ? partner!.id : undefined)
 
       toast.success(isEdit ? 'Partner updated!' : 'Partner added!')
       router.push('/privileges')

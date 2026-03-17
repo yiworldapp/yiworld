@@ -38,7 +38,6 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
         event={event as any}
         verticals={verticals || []}
         committeeMembers={(committee as any) || []}
-        userId={user.id}
       />
     </div>
   )

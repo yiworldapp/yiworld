@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { upsertEvent, replaceOrganizers, insertGalleryItem, deleteGalleryItem } from '../actions'
+import { uploadToStorage } from '../../upload-actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,7 +20,6 @@ interface EventFormProps {
   event?: Event & { event_gallery?: any[]; event_organizers?: any[] }
   verticals: VerticalRecord[]
   committeeMembers: Profile[]
-  userId: string
 }
 
 function parseDatetime(iso: string) {
@@ -38,9 +38,8 @@ function combineDatetime(date: string, time: string): string | null {
   return new Date(`${date}T${time || '00:00'}:00`).toISOString()
 }
 
-export function EventForm({ event, verticals, committeeMembers, userId }: EventFormProps) {
+export function EventForm({ event, verticals, committeeMembers }: EventFormProps) {
   const router = useRouter()
-  const supabase = createClient()
   const isEdit = !!event
 
   const [loading, setLoading] = useState(false)
@@ -82,10 +81,11 @@ export function EventForm({ event, verticals, committeeMembers, userId }: EventF
   }, [verticalId])
 
   async function uploadFile(file: File, bucket: string, path: string): Promise<string> {
-    const { data, error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true })
-    if (error) throw error
-    const { data: { publicUrl } } = supabase.storage.from(bucket).getPublicUrl(path)
-    return publicUrl
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('bucket', bucket)
+    fd.append('path', path)
+    return uploadToStorage(fd)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -112,40 +112,18 @@ export function EventForm({ event, verticals, committeeMembers, userId }: EventF
         is_published: isPublished,
         max_attendees: maxAttendees ? parseInt(maxAttendees) : null,
         cover_image_url: coverImageUrl,
-        created_by: userId,
       }
 
-      let eventId = event?.id
+      const { id: eventId } = await upsertEvent(eventData, isEdit ? event!.id : undefined)
 
-      if (isEdit) {
-        const { error } = await supabase.from('events').update(eventData).eq('id', event!.id)
-        if (error) throw error
-      } else {
-        const { data, error } = await supabase.from('events').insert(eventData).select().single()
-        if (error) throw error
-        eventId = data.id
-      }
+      await replaceOrganizers(eventId, selectedOrganizers)
 
-      if (eventId) {
-        await supabase.from('event_organizers').delete().eq('event_id', eventId)
-        if (selectedOrganizers.length > 0) {
-          await supabase.from('event_organizers').insert(
-            selectedOrganizers.map(pid => ({ event_id: eventId, profile_id: pid }))
-          )
-        }
-      }
-
-      if (galleryFiles.length > 0 && eventId) {
+      if (galleryFiles.length > 0) {
         for (let i = 0; i < galleryFiles.length; i++) {
           const file = galleryFiles[i]
           const mediaUrl = await uploadFile(file, 'event-media', `gallery/${eventId}/${Date.now()}-${file.name}`)
           const isVideo = file.type.startsWith('video/')
-          await supabase.from('event_gallery').insert({
-            event_id: eventId,
-            media_url: mediaUrl,
-            media_type: isVideo ? 'video' : 'image',
-            sort_order: existingGallery.length + i,
-          })
+          await insertGalleryItem(eventId, mediaUrl, isVideo ? 'video' : 'image', existingGallery.length + i)
         }
       }
 
@@ -160,7 +138,7 @@ export function EventForm({ event, verticals, committeeMembers, userId }: EventF
   }
 
   async function removeGalleryItem(galleryId: string) {
-    await supabase.from('event_gallery').delete().eq('id', galleryId)
+    await deleteGalleryItem(galleryId)
     setExistingGallery(prev => prev.filter(g => g.id !== galleryId))
     toast.success('Removed')
   }
@@ -312,6 +290,30 @@ export function EventForm({ event, verticals, committeeMembers, userId }: EventF
                 />
                 <p className="text-xs text-muted-foreground">{10 - existingGallery.length} of 10 slots remaining</p>
               </div>
+              {galleryFiles.length > 0 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {galleryFiles.map((file, i) => {
+                    const url = URL.createObjectURL(file)
+                    const isVideo = file.type.startsWith('video/')
+                    return (
+                      <div key={i} className="relative rounded-lg overflow-hidden aspect-square bg-muted">
+                        {isVideo ? (
+                          <video src={url} className="w-full h-full object-cover" muted playsInline preload="metadata" />
+                        ) : (
+                          <img src={url} alt="" className="w-full h-full object-cover" />
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => setGalleryFiles(prev => prev.filter((_, idx) => idx !== i))}
+                          className="absolute top-1 right-1 w-5 h-5 bg-destructive rounded-full flex items-center justify-center"
+                        >
+                          <X className="w-3 h-3 text-white" />
+                        </button>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
 

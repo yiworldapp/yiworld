@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { deleteMOU } from '../actions'
 import { Button, buttonVariants } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Trash2 } from 'lucide-react'
@@ -13,13 +13,17 @@ export function DeleteMOUButton({ mouId, mouTitle }: { mouId: string; mouTitle: 
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   async function handleDelete() {
     setLoading(true)
-    const { error } = await supabase.from('mous').delete().eq('id', mouId)
-    if (error) toast.error('Failed to delete')
-    else { toast.success('MOU deleted'); setOpen(false); router.refresh() }
+    try {
+      await deleteMOU(mouId)
+      toast.success('MOU deleted')
+      setOpen(false)
+      router.refresh()
+    } catch {
+      toast.error('Failed to delete')
+    }
     setLoading(false)
   }
 

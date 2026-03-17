@@ -6,6 +6,7 @@ export default async function NewEventPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+  // user.id intentionally not passed to form — admin users are not in profiles table
 
   const [{ data: verticals }, { data: committee }] = await Promise.all([
     supabase.from('verticals').select('*').order('label'),
@@ -23,7 +24,6 @@ export default async function NewEventPage() {
       <EventForm
         verticals={verticals || []}
         committeeMembers={(committee as any) || []}
-        userId={user.id}
       />
     </div>
   )

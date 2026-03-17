@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { upsertOffer } from '../../actions'
+import { uploadToStorage } from '../../../upload-actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -21,7 +22,6 @@ interface OfferFormProps {
 
 export function OfferForm({ offer, partners }: OfferFormProps) {
   const router = useRouter()
-  const supabase = createClient()
   const isEdit = !!offer
 
   const [loading, setLoading] = useState(false)
@@ -46,10 +46,11 @@ export function OfferForm({ offer, partners }: OfferFormProps) {
     try {
       let imageUrl = offer?.image_url || null
       if (imageFile) {
-        const path = `offer-images/${Date.now()}-${imageFile.name}`
-        const { error: uploadError } = await supabase.storage.from('offer-images').upload(path, imageFile, { upsert: true })
-        if (uploadError) throw uploadError
-        imageUrl = supabase.storage.from('offer-images').getPublicUrl(path).data.publicUrl
+        const fd = new FormData()
+        fd.append('file', imageFile)
+        fd.append('bucket', 'offer-images')
+        fd.append('path', `offer-images/${Date.now()}-${imageFile.name}`)
+        imageUrl = await uploadToStorage(fd)
       }
 
       const data = {
@@ -61,13 +62,7 @@ export function OfferForm({ offer, partners }: OfferFormProps) {
         valid_until: validUntil || null, is_active: isActive,
       }
 
-      if (isEdit) {
-        const { error } = await supabase.from('offers').update(data).eq('id', offer!.id)
-        if (error) throw error
-      } else {
-        const { error } = await supabase.from('offers').insert(data)
-        if (error) throw error
-      }
+      await upsertOffer(data, isEdit ? offer!.id : undefined)
 
       toast.success(isEdit ? 'Offer updated!' : 'Offer created!')
       router.push('/privileges')
