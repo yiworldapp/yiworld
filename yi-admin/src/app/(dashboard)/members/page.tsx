@@ -7,12 +7,7 @@ import { MemberActions } from './_components/member-actions'
 import { LinkButton } from '@/components/ui/link-button'
 import { format } from 'date-fns'
 import { Users, Eye } from 'lucide-react'
-
-const verticalColors: Record<string, string> = {
-  health: 'text-green-600 border-green-200 bg-green-50',
-  climate: 'text-orange-600 border-orange-200 bg-orange-50',
-  other: 'text-yellow-600 border-yellow-200 bg-yellow-50',
-}
+import { verticalBadgeStyle, verticalLabel } from '@/lib/vertical-colors'
 
 export default async function MembersPage({
   searchParams,
@@ -102,8 +97,8 @@ export default async function MembersPage({
                     </td>
                     <td className="py-3 px-4 hidden lg:table-cell">
                       {member.yi_vertical ? (
-                        <Badge variant="outline" className={`text-xs uppercase ${verticalColors[member.yi_vertical] || verticalColors.other}`}>
-                          {member.yi_vertical}
+                        <Badge variant="outline" className="text-xs" style={verticalBadgeStyle(member.yi_vertical)}>
+                          {verticalLabel(member.yi_vertical)}
                         </Badge>
                       ) : (
                         <span className="text-muted-foreground text-xs">—</span>

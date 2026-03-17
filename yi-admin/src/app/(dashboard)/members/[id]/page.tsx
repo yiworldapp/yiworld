@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LinkButton } from '@/components/ui/link-button'
 import { ArrowLeft, Pencil, Mail, Phone, MapPin, Briefcase, Building2, Globe, Linkedin, Instagram, Twitter, Facebook, Heart, Tag, Users } from 'lucide-react'
 import { format } from 'date-fns'
+import { verticalBadgeStyle, verticalLabel } from '@/lib/vertical-colors'
 
 function InfoRow({ label, value }: { label: string; value?: string | null }) {
   if (!value) return null
@@ -41,12 +42,6 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
 
   const fullName = [member.first_name, member.last_name].filter(Boolean).join(' ') || 'Unnamed'
   const initials = [member.first_name?.[0], member.last_name?.[0]].filter(Boolean).join('').toUpperCase() || '?'
-
-  const verticalColors: Record<string, string> = {
-    health: 'text-green-600 border-green-200 bg-green-50',
-    climate: 'text-orange-600 border-orange-200 bg-orange-50',
-    other: 'text-yellow-600 border-yellow-200 bg-yellow-50',
-  }
 
   const hasYiInfo = member.yi_vertical && member.yi_vertical !== 'none'
   const hasSocial = member.linkedin_url || member.instagram_url || member.twitter_url || member.facebook_url
@@ -92,8 +87,8 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
                   {member.member_type.replace('_', ' ')}
                 </Badge>
                 {hasYiInfo && (
-                  <Badge variant="outline" className={`text-xs ${verticalColors[member.yi_vertical!] || verticalColors.other}`}>
-                    {member.yi_vertical}
+                  <Badge variant="outline" className="text-xs" style={verticalBadgeStyle(member.yi_vertical)}>
+                    {verticalLabel(member.yi_vertical)}
                   </Badge>
                 )}
               </div>

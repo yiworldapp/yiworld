@@ -4,6 +4,7 @@ import { LinkButton } from '@/components/ui/link-button'
 import { Badge } from '@/components/ui/badge'
 import { format } from 'date-fns'
 import { Calendar, Clock, MapPin, Users, Globe, Pencil, ArrowLeft } from 'lucide-react'
+import { verticalBadgeStyle } from '@/lib/vertical-colors'
 
 export default async function ViewEventPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -24,12 +25,6 @@ export default async function ViewEventPage({ params }: { params: Promise<{ id: 
   const gallery = (event.event_gallery as any[]) || []
   const organizers = (event.event_organizers as any[]) || []
 
-  const verticalColors: Record<string, string> = {
-    health: 'text-green-600 border-green-200 bg-green-50',
-    climate: 'text-orange-600 border-orange-200 bg-orange-50',
-    other: 'text-yellow-600 border-yellow-200 bg-yellow-50',
-  }
-
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -45,7 +40,7 @@ export default async function ViewEventPage({ params }: { params: Promise<{ id: 
                 {event.is_published ? 'Live' : 'Draft'}
               </Badge>
               {vertical && (
-                <Badge variant="outline" className={`text-xs ${verticalColors[vertical.slug] || verticalColors.other}`}>
+                <Badge variant="outline" className="text-xs" style={verticalBadgeStyle(vertical.slug)}>
                   {vertical.label}
                 </Badge>
               )}

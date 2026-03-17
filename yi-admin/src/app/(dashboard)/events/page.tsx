@@ -5,6 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Plus, Calendar, Users, Eye } from 'lucide-react'
 import { format } from 'date-fns'
 import { DeleteEventButton } from './_components/delete-event-button'
+import { verticalBadgeStyle } from '@/lib/vertical-colors'
 
 export default async function EventsPage() {
   const supabase = await createClient()
@@ -22,12 +23,6 @@ export default async function EventsPage() {
   }
 
   const { data: events } = await query
-
-  const verticalColors: Record<string, string> = {
-    health: 'text-green-600 border-green-200 bg-green-50',
-    climate: 'text-orange-600 border-orange-200 bg-orange-50',
-    other: 'text-yellow-600 border-yellow-200 bg-yellow-50',
-  }
 
   return (
     <div className="space-y-6">
@@ -84,7 +79,7 @@ export default async function EventsPage() {
                   </TableCell>
                   <TableCell className="px-4 py-3 hidden xl:table-cell">
                     {vertical ? (
-                      <Badge variant="outline" className={`text-xs font-medium ${verticalColors[vertical.slug] || verticalColors.other}`}>
+                      <Badge variant="outline" className="text-xs font-medium" style={verticalBadgeStyle(vertical.slug)}>
                         {vertical.label}
                       </Badge>
                     ) : <span className="text-muted-foreground text-sm">—</span>}
