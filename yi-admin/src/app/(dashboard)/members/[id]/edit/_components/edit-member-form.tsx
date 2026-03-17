@@ -16,23 +16,7 @@ import { toast } from 'sonner'
 import { DatePicker } from '@/components/ui/date-picker'
 import type { Profile } from '@/types/database.types'
 
-// ── Constants (mirrors app_constants.dart) ────────────────────────────────────
-
-const VERTICALS = [
-  { value: 'none',              label: 'None (General Member)' },
-  { value: 'yuva',              label: 'YUVA' },
-  { value: 'thalir',            label: 'THALIR' },
-  { value: 'rural_initiatives', label: 'Rural Initiatives' },
-  { value: 'masoom',            label: 'MASOOM' },
-  { value: 'road_safety',       label: 'Road Safety' },
-  { value: 'health',            label: 'Health' },
-  { value: 'accessibility',     label: 'Accessibility' },
-  { value: 'climate_change',    label: 'Climate Change' },
-  { value: 'entrepreneurship',  label: 'Entrepreneurship' },
-  { value: 'innovation',        label: 'Innovation' },
-  { value: 'learning',          label: 'Learning' },
-  { value: 'branding',          label: 'Branding' },
-]
+// VERTICALS removed — passed as prop from server component (live from DB)
 
 const POSITIONS = [
   { value: 'none',        label: 'None' },
@@ -187,7 +171,14 @@ function TagSelector({
 
 // ── Main form ─────────────────────────────────────────────────────────────────
 
-export function EditMemberForm({ member }: { member: Profile }) {
+export function EditMemberForm({ member, verticals }: {
+  member: Profile
+  verticals: { slug: string; label: string }[]
+}) {
+  const allVerticals = [
+    { value: 'none', label: 'None (General Member)' },
+    ...verticals.map(v => ({ value: v.slug, label: v.label })),
+  ]
   const router = useRouter()
   const [saving, setSaving] = useState(false)
 
@@ -517,7 +508,7 @@ export function EditMemberForm({ member }: { member: Profile }) {
             }))}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                {VERTICALS.map(v => <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>)}
+                {allVerticals.map(v => <SelectItem key={v.value} value={v.value}>{v.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </Field>

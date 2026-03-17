@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../core/constants/app_constants.dart';
+import '../../../core/services/verticals_cache.dart';
 import '../../../core/theme/app_colors.dart';
 
 class EditProfileScreen extends StatefulWidget {
@@ -461,8 +462,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _label('YI Vertical'),
             const SizedBox(height: 6),
             _dropdown<Map<String, String>>(
-              value: AppConstants.yiVerticals.firstWhere((v) => v['value'] == _yiVertical),
-              items: AppConstants.yiVerticals,
+              value: VerticalsCache.list.firstWhere((v) => v['value'] == _yiVertical, orElse: () => VerticalsCache.list.first),
+              items: VerticalsCache.list,
               label: (v) => v['label']!,
               onChanged: (v) => setState(() {
                 _yiVertical = v['value']!;
@@ -474,7 +475,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _label('YI Position'),
               const SizedBox(height: 6),
               _dropdown<Map<String, String>>(
-                value: AppConstants.yiPositions.firstWhere((p) => p['value'] == _yiPosition),
+                value: AppConstants.yiPositions.firstWhere((p) => p['value'] == _yiPosition, orElse: () => AppConstants.yiPositions.first),
                 items: AppConstants.yiPositions,
                 label: (v) => v['label']!,
                 onChanged: (v) => setState(() => _yiPosition = v['value']!),

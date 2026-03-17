@@ -326,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     if (_selectedVertical != null)
                       _ActiveChip(
-                        label: AppConstants.yiVerticals
+                        label: VerticalsCache.list
                             .firstWhere((v) => v['value'] == _selectedVertical, orElse: () => {'label': _selectedVertical!})['label']!,
                         onRemove: () { setState(() => _selectedVertical = null); _loadEvents(); },
                       ),
@@ -549,7 +549,7 @@ class _FilterSheetState extends State<_FilterSheet> {
                       groupValue: _vertical ?? '__all__',
                       onTap: (_) => setState(() => _vertical = null),
                     ),
-                    ...AppConstants.yiVerticals
+                    ...VerticalsCache.list
                         .where((v) => v['value'] != 'none')
                         .map((v) => _SheetChip(
                               label: v['label']!,

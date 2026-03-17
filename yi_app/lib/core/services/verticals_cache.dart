@@ -16,14 +16,28 @@ class VerticalsCache {
     try {
       final data = await Supabase.instance.client
           .from('verticals')
-          .select('slug, label, color_hex');
+          .select('slug, label, color_hex')
+          .order('label');
       for (final v in (data as List)) {
         _cache[v['slug'] as String] = Map<String, dynamic>.from(v as Map);
       }
       _loaded = true;
     } catch (_) {
-      // Silently fall back to hardcoded colors if fetch fails
+      // Silently fall back if fetch fails
     }
+  }
+
+  /// Returns verticals as dropdown items — 'none' always first.
+  static List<Map<String, String>> get list {
+    final items = _cache.entries
+        .where((e) => e.key != 'none')
+        .map((e) => {'value': e.key, 'label': e.value['label'] as String})
+        .toList()
+      ..sort((a, b) => a['label']!.compareTo(b['label']!));
+    return [
+      {'value': 'none', 'label': 'None (General Member)'},
+      ...items,
+    ];
   }
 
   static Color colorForSlug(String? slug) {

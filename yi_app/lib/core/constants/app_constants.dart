@@ -1,22 +1,9 @@
+import '../services/verticals_cache.dart';
+
 class AppConstants {
   AppConstants._();
 
-  // ── YI Verticals ─────────────────────────────────────────────────────────
-  static const List<Map<String, String>> yiVerticals = [
-    {'value': 'none',              'label': 'None (General Member)'},
-    {'value': 'yuva',             'label': 'YUVA'},
-    {'value': 'thalir',           'label': 'THALIR'},
-    {'value': 'rural_initiatives','label': 'Rural Initiatives'},
-    {'value': 'masoom',           'label': 'MASOOM'},
-    {'value': 'road_safety',      'label': 'Road Safety'},
-    {'value': 'health',           'label': 'Health'},
-    {'value': 'accessibility',    'label': 'Accessibility'},
-    {'value': 'climate_change',   'label': 'Climate Change'},
-    {'value': 'entrepreneurship', 'label': 'Entrepreneurship'},
-    {'value': 'innovation',       'label': 'Innovation'},
-    {'value': 'learning',         'label': 'Learning'},
-    {'value': 'branding',         'label': 'Branding'},
-  ];
+  // yiVerticals removed — fetch live from DB via VerticalsCache.list
 
   // ── YI Positions (shown only when vertical != none) ───────────────────────
   static const List<Map<String, String>> yiPositions = [
@@ -187,12 +174,8 @@ class AppConstants {
   ];
 
   // ── Vertical label helper ─────────────────────────────────────────────────
-  static String verticalLabel(String? value) {
-    if (value == null) return 'NONE';
-    return yiVerticals
-        .firstWhere((v) => v['value'] == value, orElse: () => {'label': value})['label']!
-        .toUpperCase();
-  }
+  static String verticalLabel(String? value) =>
+      VerticalsCache.labelForSlug(value);
 
   // ── Position label helper ─────────────────────────────────────────────────
   static String positionLabel(String? value) {
