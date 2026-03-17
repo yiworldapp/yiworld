@@ -177,7 +177,7 @@ export function EditMemberForm({ member, verticals }: {
 }) {
   const allVerticals = [
     { value: 'none', label: 'None (General Member)' },
-    ...verticals.map(v => ({ value: v.slug, label: v.label })),
+    ...verticals.filter(v => v.slug !== 'none').map(v => ({ value: v.slug, label: v.label })),
   ]
   const router = useRouter()
   const [saving, setSaving] = useState(false)
