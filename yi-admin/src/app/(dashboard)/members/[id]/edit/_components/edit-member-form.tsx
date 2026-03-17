@@ -47,12 +47,13 @@ const BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']
 
 const INDUSTRIES = [
   'Agriculture', 'Automotive', 'Banking & Finance',
-  'Construction & Real Estate', 'Consumer Goods', 'Defence', 'Design', 'Dentist',
+  'Construction', 'Consumer Goods', 'Defence', 'Design', 'Digital Marketing', 'Dentist',
   'Education', 'Energy & Utilities', 'Entertainment & Media', 'Food & Beverage',
   'Government & Public Sector', 'Healthcare & Pharma', 'Hospitality & Tourism',
-  'Industrial Chemical', 'Information Technology', 'Insurance', 'Legal & Compliance',
-  'Logistics & Supply Chain', 'Manufacturing', 'NGO & Social Sector',
-  'Retail', 'Sports & Fitness', 'Telecommunications', 'Textiles & Apparel', 'Other',
+  'Industrial Chemical', 'Infrastructure', 'Information Technology', 'Insurance',
+  'Interior Designer', 'Legal & Compliance', 'Logistics & Supply Chain', 'Manufacturing',
+  'NGO & Social Sector', 'Real Estate', 'Retail', 'Sports & Fitness', 'Technology',
+  'Telecommunications', 'Textiles & Apparel', 'Other',
 ]
 
 const COUNTRIES = [
