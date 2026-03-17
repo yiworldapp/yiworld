@@ -76,10 +76,30 @@ class _LoginScreenState extends State<LoginScreen> {
         context.pushNamed('otp', extra: {'email': email});
       }
     } catch (e) {
-      setState(() => _error = e.toString());
+      setState(() => _error = _friendlyAuthError(e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
+  }
+
+  String _friendlyAuthError(Object e) {
+    final msg = e.toString().toLowerCase();
+    if (msg.contains('invalid format') || msg.contains('validation_failed')) {
+      return 'Please enter a valid email address (e.g. name@example.com).';
+    }
+    if (msg.contains('email not confirmed') || msg.contains('not confirmed')) {
+      return 'Please verify your email first, then try again.';
+    }
+    if (msg.contains('rate limit') || msg.contains('too many') || msg.contains('429')) {
+      return 'Too many attempts. Please wait a minute and try again.';
+    }
+    if (msg.contains('network') || msg.contains('socket') || msg.contains('connection')) {
+      return 'No internet connection. Please check your network and try again.';
+    }
+    if (msg.contains('not authorized') || msg.contains('unauthorized')) {
+      return 'This email is not authorized. Please contact your chapter coordinator.';
+    }
+    return 'Something went wrong. Please try again.';
   }
 
   @override
