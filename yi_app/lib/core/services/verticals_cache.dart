@@ -10,6 +10,7 @@ class VerticalsCache {
 
   static final Map<String, Map<String, dynamic>> _cache = {};
   static bool _loaded = false;
+  static List<Map<String, String>>? _list;
 
   static Future<void> load() async {
     if (_loaded) return;
@@ -21,6 +22,7 @@ class VerticalsCache {
       for (final v in (data as List)) {
         _cache[v['slug'] as String] = Map<String, dynamic>.from(v as Map);
       }
+      _list = null; // invalidate cached list after reload
       _loaded = true;
     } catch (_) {
       // Silently fall back if fetch fails
@@ -28,16 +30,20 @@ class VerticalsCache {
   }
 
   /// Returns verticals as dropdown items — 'none' always first.
+  /// The same list/map instances are returned on every call so that
+  /// Flutter's DropdownButton identity comparison works correctly.
   static List<Map<String, String>> get list {
+    if (_list != null) return _list!;
     final items = _cache.entries
         .where((e) => e.key != 'none')
         .map((e) => {'value': e.key, 'label': e.value['label'] as String})
         .toList()
       ..sort((a, b) => a['label']!.compareTo(b['label']!));
-    return [
+    _list = [
       {'value': 'none', 'label': 'None (General Member)'},
       ...items,
     ];
+    return _list!;
   }
 
   static Color colorForSlug(String? slug) {
