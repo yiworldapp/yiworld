@@ -33,7 +33,7 @@ class _OtpVerifyScreenState extends State<OtpVerifyScreen> {
       try {
         await Supabase.instance.client.auth.signInWithPassword(
           email: 'yiworldapp@gmail.com',
-          password: '1234567890',
+          password: 'Yiworld@123#',
         );
         if (mounted) context.go('/events');
       } catch (e) {
