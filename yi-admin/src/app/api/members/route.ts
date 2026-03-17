@@ -19,12 +19,12 @@ export async function PATCH(req: NextRequest) {
 
   const supabase = await createAdminClient()
 
-  // If phone is changing, update auth.users as well to keep them in sync
-  if (updates.phone) {
-    const { error: authErr } = await supabase.auth.admin.updateUserById(id, {
-      phone: updates.phone,
-      phone_confirm: true,
-    })
+  // Keep auth.users in sync for fields that are used for login
+  const authUpdates: Record<string, unknown> = {}
+  if (updates.phone) { authUpdates.phone = updates.phone; authUpdates.phone_confirm = true }
+  if (updates.primary_email) { authUpdates.email = updates.primary_email; authUpdates.email_confirm = true }
+  if (Object.keys(authUpdates).length > 0) {
+    const { error: authErr } = await supabase.auth.admin.updateUserById(id, authUpdates)
     if (authErr) return NextResponse.json({ error: `Auth update failed: ${authErr.message}` }, { status: 500 })
   }
 
