@@ -66,7 +66,6 @@ export function OfferForm({ offer, partners }: OfferFormProps) {
 
       toast.success(isEdit ? 'Offer updated!' : 'Offer created!')
       router.push('/privileges')
-      router.refresh()
     } catch (err: any) {
       toast.error(err.message)
     } finally {

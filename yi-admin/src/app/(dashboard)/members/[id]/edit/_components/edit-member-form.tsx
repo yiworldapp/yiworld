@@ -301,7 +301,6 @@ export function EditMemberForm({ member, verticals }: {
 
     toast.success('Member updated')
     router.push(`/members/${member.id}`)
-    router.refresh()
   }
 
   const isMarried = form.relationship_status === 'married'

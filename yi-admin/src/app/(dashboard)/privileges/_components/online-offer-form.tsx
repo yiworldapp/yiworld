@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { uploadToStorage } from '../../upload-actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -28,7 +28,6 @@ interface Props { offer?: OnlineOffer }
 
 export function OnlineOfferForm({ offer }: Props) {
   const router = useRouter()
-  const supabase = createClient()
   const isEdit = !!offer
 
   const [loading, setLoading] = useState(false)
@@ -47,10 +46,11 @@ export function OnlineOfferForm({ offer }: Props) {
   const [bannerFile, setBannerFile] = useState<File | null>(null)
 
   async function uploadFile(file: File) {
-    const path = `${Date.now()}-${file.name}`
-    const { error } = await supabase.storage.from('offer-images').upload(path, file, { upsert: true })
-    if (error) throw error
-    return supabase.storage.from('offer-images').getPublicUrl(path).data.publicUrl
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('bucket', 'offer-images')
+    fd.append('path', `offer-images/${Date.now()}-${file.name}`)
+    return uploadToStorage(fd)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -75,7 +75,6 @@ export function OnlineOfferForm({ offer }: Props) {
 
       toast.success(isEdit ? 'Offer updated' : 'Offer created')
       router.push('/privileges')
-      router.refresh()
     } catch (err: any) {
       toast.error(err.message || 'Something went wrong')
       setLoading(false)

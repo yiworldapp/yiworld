@@ -51,7 +51,6 @@ export function PartnerForm({ partner }: { partner?: Partner }) {
 
       toast.success(isEdit ? 'Partner updated!' : 'Partner added!')
       router.push('/privileges')
-      router.refresh()
     } catch (err: any) {
       toast.error(err.message)
     } finally {
