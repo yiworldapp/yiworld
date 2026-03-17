@@ -75,6 +75,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void initState() {
     super.initState();
     _loadProfile();
+    VerticalsCache.ensureLoaded().then((_) { if (mounted) setState(() {}); });
   }
 
   @override
@@ -216,6 +217,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'business_website':    _businessWebCtrl.text.trim().isEmpty     ? null : _businessWebCtrl.text.trim(),
         'yi_vertical':         _yiVertical,
         'yi_position':         _yiVertical == 'none' ? 'none' : _yiPosition,
+        'member_type':         _yiVertical == 'none' ? 'member' : 'committee',
         'yi_member_since':     int.tryParse(_memberSinceYearCtrl.text.trim()),
         'linkedin_url':        _linkedinCtrl.text.trim().isEmpty        ? null : _linkedinCtrl.text.trim(),
         'instagram_url':       _instagramCtrl.text.trim().isEmpty       ? null : _instagramCtrl.text.trim(),

@@ -29,6 +29,16 @@ class VerticalsCache {
     }
   }
 
+  /// Re-fetches if the cache has no real verticals (only the hardcoded 'none').
+  /// Call from screens that show the vertical picker to guarantee a full list.
+  static Future<void> ensureLoaded() async {
+    if (_loaded && _cache.length > 1) return; // already have real data
+    _loaded = false;
+    _list = null;
+    _cache.clear();
+    await load();
+  }
+
   /// Returns verticals as dropdown items — 'none' always first.
   /// The same list/map instances are returned on every call so that
   /// Flutter's DropdownButton identity comparison works correctly.

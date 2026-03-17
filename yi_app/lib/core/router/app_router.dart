@@ -44,16 +44,22 @@ GoRouter appRouter(AppRouterRef ref) {
       if (isSplash) return null; // always allow splash
 
       if (!isLoggedIn && !isAuthRoute) return '/login';
-      if (isLoggedIn && isAuthRoute) {
-        // Check if onboarding done
-        final profile = await supabase
-            .from('profiles')
-            .select('onboarding_done')
-            .eq('id', session.user.id)
-            .single()
-            .catchError((_) => {'onboarding_done': false});
-        if (profile['onboarding_done'] != true) return '/onboarding';
-        return '/events';
+
+      if (isLoggedIn) {
+        final isOnboarding = state.matchedLocation == '/onboarding';
+        // Check onboarding status for all logged-in users except those already on /onboarding
+        if (!isOnboarding) {
+          final profile = await supabase
+              .from('profiles')
+              .select('onboarding_done')
+              .eq('id', session!.user.id)
+              .maybeSingle()
+              .catchError((_) => null);
+          final done = profile?['onboarding_done'] == true;
+          if (!done) return '/onboarding';
+        }
+        // Logged-in + onboarding done + on auth route → go to events
+        if (isAuthRoute) return '/events';
       }
       return null;
     },

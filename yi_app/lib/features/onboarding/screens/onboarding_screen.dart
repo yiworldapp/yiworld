@@ -75,6 +75,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     // Pre-fill primary email from auth (read-only — auth email is the login identity)
     final authEmail = Supabase.instance.client.auth.currentUser?.email ?? '';
     _primaryEmailCtrl.text = authEmail;
+    // Ensure verticals are loaded — splash may have completed before DB responded
+    VerticalsCache.ensureLoaded().then((_) { if (mounted) setState(() {}); });
   }
 
   @override
@@ -226,6 +228,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         'business_website':   _businessWebCtrl.text.trim().isEmpty ? null : _businessWebCtrl.text.trim(),
         'yi_vertical':        _yiVertical,
         'yi_position':        _yiVertical == 'none' ? 'none' : _yiPosition,
+        'member_type':        _yiVertical == 'none' ? 'member' : 'committee',
         'yi_member_since':    int.tryParse(_memberSinceYearCtrl.text.trim()),
         'linkedin_url':       _linkedinCtrl.text.trim().isEmpty ? null : _linkedinCtrl.text.trim(),
         'instagram_url':      _instagramCtrl.text.trim().isEmpty ? null : _instagramCtrl.text.trim(),
