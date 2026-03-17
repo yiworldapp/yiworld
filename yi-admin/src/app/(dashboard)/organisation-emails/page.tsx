@@ -26,7 +26,7 @@ export default async function OrganisationEmailsPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <div className="space-y-6">
       <div>
         <h1 className="text-xl font-bold">Organisation Emails</h1>
         <p className="text-sm text-muted-foreground mt-1">
