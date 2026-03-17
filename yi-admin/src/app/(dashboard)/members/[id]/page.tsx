@@ -44,7 +44,8 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
   const initials = [member.first_name?.[0], member.last_name?.[0]].filter(Boolean).join('').toUpperCase() || '?'
 
   const hasYiInfo = member.yi_vertical && member.yi_vertical !== 'none'
-  const hasSocial = member.linkedin_url || member.instagram_url || member.twitter_url || member.facebook_url
+  function validUrl(v: string | null | undefined) { return v && v !== '-' && v.length > 1 ? v : null }
+  const hasSocial = validUrl(member.linkedin_url) || validUrl(member.instagram_url) || validUrl(member.twitter_url) || validUrl(member.facebook_url)
   const hasProfessional = member.job_title || member.company_name || member.industry || member.business_bio || member.business_website
   const hasPersonal = member.dob || member.blood_group || member.relationship_status || member.city || member.country
   const hasContact = member.phone || member.primary_email || member.secondary_email || member.secondary_phone
@@ -99,23 +100,23 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
           {hasSocial && (
             <Section title="Social">
               <div className="space-y-2">
-                {member.linkedin_url && (
-                  <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors">
+                {validUrl(member.linkedin_url) && (
+                  <a href={member.linkedin_url!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors">
                     <Linkedin className="w-4 h-4 shrink-0" /> LinkedIn
                   </a>
                 )}
-                {member.instagram_url && (
-                  <a href={member.instagram_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors">
+                {validUrl(member.instagram_url) && (
+                  <a href={member.instagram_url!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors">
                     <Instagram className="w-4 h-4 shrink-0" /> Instagram
                   </a>
                 )}
-                {member.twitter_url && (
-                  <a href={member.twitter_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors">
+                {validUrl(member.twitter_url) && (
+                  <a href={member.twitter_url!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors">
                     <Twitter className="w-4 h-4 shrink-0" /> Twitter / X
                   </a>
                 )}
-                {member.facebook_url && (
-                  <a href={member.facebook_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors">
+                {validUrl(member.facebook_url) && (
+                  <a href={member.facebook_url!} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm hover:text-foreground text-muted-foreground transition-colors">
                     <Facebook className="w-4 h-4 shrink-0" /> Facebook
                   </a>
                 )}
@@ -195,8 +196,8 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
 
           {/* YI Info */}
           <Section title="Young Indians">
-            <InfoRow label="Vertical" value={hasYiInfo ? member.yi_vertical : null} />
-            <InfoRow label="Position" value={member.yi_position && member.yi_position !== 'none' ? member.yi_position : null} />
+            <InfoRow label="Vertical" value={hasYiInfo ? verticalLabel(member.yi_vertical) : null} />
+            <InfoRow label="Position" value={member.yi_position && member.yi_position !== 'none' ? member.yi_position.replace(/_/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()) : null} />
             <InfoRow label="Member Since" value={member.yi_member_since ? String(member.yi_member_since) : null} />
             <InfoRow label="Status" value="Active" />
           </Section>
