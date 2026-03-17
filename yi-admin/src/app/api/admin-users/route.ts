@@ -56,7 +56,7 @@ export async function DELETE(req: NextRequest) {
   if (id === caller.id) return NextResponse.json({ error: 'Cannot delete yourself' }, { status: 400 })
 
   const supabase = await createAdminClient()
-  const { error } = await supabase.from('admin_users').delete().eq('id', id)
+  const { error } = await supabase.auth.admin.deleteUser(id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
