@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { EventForm } from '../_components/event-form'
 
@@ -8,9 +8,10 @@ export default async function NewEventPage() {
   if (!user) redirect('/login')
   // user.id intentionally not passed to form — admin users are not in profiles table
 
+  const admin = await createAdminClient()
   const [{ data: verticals }, { data: committee }] = await Promise.all([
-    supabase.from('verticals').select('*').order('label'),
-    supabase.from('profiles').select('id, first_name, last_name, yi_vertical, member_type, headshot_url')
+    admin.from('verticals').select('*').order('label'),
+    admin.from('profiles').select('id, first_name, last_name, yi_vertical, member_type, headshot_url')
       .in('member_type', ['committee', 'super_admin'])
       .order('first_name'),
   ])

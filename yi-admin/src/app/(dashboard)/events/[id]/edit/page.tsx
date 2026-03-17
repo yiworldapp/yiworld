@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import { EventForm } from '../../_components/event-form'
 import { LinkButton } from '@/components/ui/link-button'
@@ -10,13 +10,14 @@ export default async function EditEventPage({ params }: { params: Promise<{ id: 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  const admin = await createAdminClient()
   const [{ data: event }, { data: verticals }, { data: committee }] = await Promise.all([
-    supabase.from('events')
+    admin.from('events')
       .select('*, event_gallery(*), event_organizers(*)')
       .eq('id', id)
       .single(),
-    supabase.from('verticals').select('*').order('label'),
-    supabase.from('profiles').select('id, first_name, last_name, yi_vertical, member_type, headshot_url')
+    admin.from('verticals').select('*').order('label'),
+    admin.from('profiles').select('id, first_name, last_name, yi_vertical, member_type, headshot_url')
       .in('member_type', ['committee', 'super_admin'])
       .order('first_name'),
   ])

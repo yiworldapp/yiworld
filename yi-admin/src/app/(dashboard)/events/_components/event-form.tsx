@@ -129,7 +129,6 @@ export function EventForm({ event, verticals, committeeMembers }: EventFormProps
 
       toast.success(isEdit ? 'Event updated!' : 'Event created!')
       router.push('/events')
-      router.refresh()
     } catch (err: any) {
       toast.error(err.message || 'Something went wrong')
     } finally {
