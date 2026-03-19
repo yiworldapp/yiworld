@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import { LinkButton } from '@/components/ui/link-button'
 import { Badge } from '@/components/ui/badge'
@@ -12,7 +12,8 @@ export default async function ViewEventPage({ params }: { params: Promise<{ id: 
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: event } = await supabase
+  const adminSupabase = await createAdminClient()
+  const { data: event } = await adminSupabase
     .from('events')
     .select('*, verticals(label, slug), event_rsvps(count), event_gallery(*), event_organizers(profile_id, profiles(first_name, last_name, headshot_url))')
     .eq('id', id)

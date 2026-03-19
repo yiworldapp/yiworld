@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { LinkButton } from '@/components/ui/link-button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -13,7 +13,8 @@ export default async function EventsPage() {
   const { data: adminUser } = await supabase
     .from('admin_users').select('role').eq('id', user!.id).single()
 
-  let query = supabase
+  const adminSupabase = await createAdminClient()
+  let query = adminSupabase
     .from('events')
     .select(`*, verticals(label, color_hex, slug), event_rsvps(count)`)
     .order('starts_at', { ascending: false })
