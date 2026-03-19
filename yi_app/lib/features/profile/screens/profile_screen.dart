@@ -157,11 +157,11 @@ class ProfileScreen extends StatelessWidget {
                             _labeledBadge('Vertical', VerticalsCache.labelForSlug(yiVertical), verticalColor),
                           if (yiPosition != null && yiPosition != 'none')
                             _labeledBadge('Position', AppConstants.positionLabel(yiPosition), AppColors.orange),
-                          _badge(
-                            (p['member_type'] as String? ?? 'member') == 'super_admin' ? 'Admin'
-                                : (p['member_type'] as String? ?? 'member') == 'committee' ? 'Committee' : 'Member',
-                            AppColors.green,
-                          ),
+                          if ((p['member_type'] as String? ?? 'member') != 'committee')
+                            _badge(
+                              (p['member_type'] as String? ?? 'member') == 'super_admin' ? 'Admin' : 'Member',
+                              AppColors.green,
+                            ),
                         ],
                       ),
 
