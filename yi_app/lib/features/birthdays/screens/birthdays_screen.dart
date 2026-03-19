@@ -164,9 +164,10 @@ class _BirthdayMonthView extends StatelessWidget {
 
             final jobTitle = member['job_title'] as String?;
             final company = member['company_name'] as String?;
+            bool _isValid(String? s) => s != null && s.isNotEmpty && s.trim().toLowerCase() != 'na';
             final jobLine = [
-              if (jobTitle?.isNotEmpty == true) jobTitle!,
-              if (company?.isNotEmpty == true) company!,
+              if (_isValid(jobTitle)) jobTitle!,
+              if (_isValid(company)) company!,
             ].join(' @ ');
 
             final memberId = member['id'] as String?;

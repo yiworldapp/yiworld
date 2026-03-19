@@ -319,10 +319,11 @@ class MemberCard extends StatelessWidget {
     final yiPosition = member['yi_position'] as String?;
     final city = member['city'] as String?;
 
+    bool _isValid(dynamic s) => s is String && s.isNotEmpty && s.trim().toLowerCase() != 'na';
     final subtitle = [
-      member['job_title'],
-      if (member['company_name'] != null) member['company_name'],
-    ].whereType<String>().join(' @ ');
+      if (_isValid(member['job_title'])) member['job_title'] as String,
+      if (_isValid(member['company_name'])) member['company_name'] as String,
+    ].join(' @ ');
 
     final positionText = (yiPosition != null && yiPosition != 'none')
         ? AppConstants.positionLabel(yiPosition)

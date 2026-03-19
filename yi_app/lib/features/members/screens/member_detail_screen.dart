@@ -137,16 +137,18 @@ class MemberDetailScreen extends StatelessWidget {
                               fullName.isEmpty ? 'Member' : fullName,
                               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                             ),
-                            if ((m['job_title'] as String?)?.isNotEmpty == true) ...[
-                              const SizedBox(height: 3),
-                              Text(
-                                [
-                                  m['job_title'] as String,
-                                  if ((m['company_name'] as String?)?.isNotEmpty == true) m['company_name'] as String,
-                                ].join(' @ '),
-                                style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
-                              ),
-                            ],
+                            Builder(builder: (_) {
+                              bool v(String? s) => s != null && s.isNotEmpty && s.trim().toLowerCase() != 'na';
+                              final parts = [
+                                if (v(m['job_title'] as String?)) m['job_title'] as String,
+                                if (v(m['company_name'] as String?)) m['company_name'] as String,
+                              ];
+                              if (parts.isEmpty) return const SizedBox.shrink();
+                              return Column(children: [
+                                const SizedBox(height: 3),
+                                Text(parts.join(' @ '), style: const TextStyle(color: AppColors.textMuted, fontSize: 13)),
+                              ]);
+                            }),
                           ],
                         ),
                       ),
