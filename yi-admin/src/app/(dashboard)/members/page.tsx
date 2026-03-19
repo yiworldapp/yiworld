@@ -105,7 +105,7 @@ export default async function MembersPage({
                       )}
                     </td>
                     <td className="py-3 px-4 hidden lg:table-cell text-muted-foreground text-sm">
-                      {format(new Date(member.created_at), 'MMM d, yyyy')}
+                      {format(new Date(member.created_at), 'dd/MM/yyyy')}
                     </td>
                     <td className="py-3 px-4 hidden sm:table-cell">
                       <Badge variant="outline" className="text-xs font-medium text-green-600 border-green-200 bg-green-50">

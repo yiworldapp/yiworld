@@ -60,7 +60,7 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
         <div className="flex-1">
           <h1 className="text-2xl font-bold tracking-tight">{fullName}</h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            {member.member_type.replace('_', ' ')} · Joined {format(new Date(member.created_at), 'MMM d, yyyy')}
+            {member.member_type.replace('_', ' ')} · Joined {format(new Date(member.created_at), 'dd/MM/yyyy')}
           </p>
         </div>
         <LinkButton href={`/members/${id}/edit`} variant="outline" size="sm" className="gap-2">
@@ -140,7 +140,7 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
           {/* Personal */}
           {hasPersonal && (
             <Section title="Personal">
-              <InfoRow label="Date of Birth" value={member.dob ? format(new Date(member.dob), 'MMM d, yyyy') : null} />
+              <InfoRow label="Date of Birth" value={member.dob ? format(new Date(member.dob), 'dd/MM/yyyy') : null} />
               <InfoRow label="Blood Group" value={member.blood_group} />
               <InfoRow label="Location" value={[member.city, member.state, member.country].filter(Boolean).join(', ')} />
               <InfoRow label="Relationship" value={member.relationship_status} />
@@ -148,7 +148,7 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
               {member.is_spouse_yi_member != null && (
                 <InfoRow label="Spouse is YI Member" value={member.is_spouse_yi_member ? 'Yes' : 'No'} />
               )}
-              <InfoRow label="Anniversary" value={member.anniversary_date ? format(new Date(member.anniversary_date), 'MMM d, yyyy') : null} />
+              <InfoRow label="Anniversary" value={member.anniversary_date ? format(new Date(member.anniversary_date), 'dd/MM/yyyy') : null} />
               {member.personal_bio && (
                 <div className="pt-2">
                   <p className="text-xs text-muted-foreground mb-1">Personal Bio</p>
@@ -205,7 +205,7 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
           {/* Account */}
           <Section title="Account">
             <InfoRow label="Member ID" value={member.id} />
-            <InfoRow label="Joined" value={format(new Date(member.created_at), 'MMM d, yyyy')} />
+            <InfoRow label="Joined" value={format(new Date(member.created_at), 'dd/MM/yyyy')} />
             <InfoRow label="Onboarding" value={member.onboarding_done ? 'Complete' : 'Incomplete'} />
           </Section>
         </div>

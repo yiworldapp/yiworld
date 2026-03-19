@@ -1,3 +1,4 @@
+import { format } from 'date-fns'
 import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -108,7 +109,7 @@ export default async function PrivilegesPage() {
                         : <span className="text-muted-foreground text-sm">—</span>}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-muted-foreground hidden md:table-cell text-sm">
-                      {offer.expiry_date ? new Date(offer.expiry_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                      {offer.expiry_date ? format(new Date(offer.expiry_date), 'dd/MM/yyyy') : '—'}
                     </TableCell>
                     <TableCell className="px-4 py-3">
                       <Badge variant={offer.is_active ? 'default' : 'secondary'} className="text-xs font-medium">
@@ -183,7 +184,7 @@ export default async function PrivilegesPage() {
                         : <span className="text-muted-foreground">—</span>}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-muted-foreground hidden md:table-cell text-sm">
-                      {offer.expiry_date ? new Date(offer.expiry_date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                      {offer.expiry_date ? format(new Date(offer.expiry_date), 'dd/MM/yyyy') : '—'}
                     </TableCell>
                     <TableCell className="px-4 py-3">
                       <Badge variant={offer.is_active ? 'default' : 'secondary'} className="text-xs font-medium">

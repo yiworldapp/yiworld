@@ -713,7 +713,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             Expanded(
               child: Text(
-                value == null ? hint : DateFormat('dd MMM yyyy').format(value),
+                value == null ? hint : DateFormat('dd/MM/yyyy').format(value),
                 style: TextStyle(color: value == null ? AppColors.textMuted : AppColors.white, fontSize: 15),
               ),
             ),

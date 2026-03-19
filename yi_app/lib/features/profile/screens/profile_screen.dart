@@ -232,7 +232,7 @@ class ProfileScreen extends StatelessWidget {
                         _detailRow(Icons.verified_outlined, 'YI Member Since', memberSinceYear.toString()),
                       if ((p['created_at'] as String?) != null)
                         _detailRow(Icons.calendar_today_outlined, 'App Member Since',
-                            DateFormat('MMMM yyyy').format(DateTime.parse(p['created_at'] as String).toLocal())),
+                            DateFormat('dd/MM/yyyy').format(DateTime.parse(p['created_at'] as String).toLocal())),
 
                       // ── Personal ─────────────────────────────────────────
                       if (dob != null ||
@@ -240,7 +240,7 @@ class ProfileScreen extends StatelessWidget {
                           relationshipStatus != null) ...[
                         _sectionHeader('Personal'),
                         if (dob != null)
-                          _detailRow(Icons.cake_outlined, 'Birthday', DateFormat('d MMMM yyyy').format(dob)),
+                          _detailRow(Icons.cake_outlined, 'Birthday', DateFormat('dd/MM/yyyy').format(dob)),
                         if ((p['blood_group'] as String?)?.isNotEmpty == true)
                           _detailRow(Icons.bloodtype_outlined, 'Blood Group', p['blood_group'] as String),
                         if (relationshipStatus != null)
@@ -251,7 +251,7 @@ class ProfileScreen extends StatelessWidget {
                           _detailRow(Icons.groups_outlined, 'Spouse YI Member', 'Yes'),
                         if (isMarried && anniversaryDate != null)
                           _detailRow(Icons.celebration_outlined, 'Anniversary',
-                              DateFormat('d MMMM yyyy').format(anniversaryDate)),
+                              DateFormat('dd/MM/yyyy').format(anniversaryDate)),
                       ],
 
                       // ── Business Tags ────────────────────────────────────

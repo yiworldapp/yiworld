@@ -75,7 +75,7 @@ export default async function EventsPage() {
                     </div>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-muted-foreground hidden lg:table-cell text-sm whitespace-nowrap">
-                    {format(new Date(event.starts_at), 'MMM d, yyyy · h:mm a')}
+                    {format(new Date(event.starts_at), 'dd/MM/yyyy · h:mm a')}
                   </TableCell>
                   <TableCell className="px-4 py-3 hidden xl:table-cell">
                     {vertical ? (

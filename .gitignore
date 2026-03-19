@@ -5,8 +5,12 @@ yi-admin/.env
 yi-admin/.env.local
 yi-admin/.env.production
 
-# yi_app (Flutter)
-yi_app/build/
+# yi_app (Flutter) — keep build/web for Netlify deploy
+yi_app/build/app/
+yi_app/build/ios/
+yi_app/build/linux/
+yi_app/build/macos/
+yi_app/build/windows/
 yi_app/.dart_tool/
 yi_app/.flutter-plugins
 yi_app/.flutter-plugins-dependencies

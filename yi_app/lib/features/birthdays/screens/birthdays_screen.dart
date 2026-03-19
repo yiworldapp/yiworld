@@ -157,7 +157,7 @@ class _BirthdayMonthView extends StatelessWidget {
             final isPast = (daysUntil ?? 0) < 0;
             final dateText = relDate.isNotEmpty
               ? relDate
-              : dob != null ? DateFormat('MMM d').format(dob) : '';
+              : dob != null ? DateFormat('dd/MM').format(dob) : '';
 
             final displayName = (member['full_name'] as String? ?? '').trim();
             final initial = displayName.isNotEmpty ? displayName[0].toUpperCase() : '?';
