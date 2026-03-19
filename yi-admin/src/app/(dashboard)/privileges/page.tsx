@@ -16,8 +16,8 @@ export default async function PrivilegesPage() {
   if (adminUser?.role !== 'super_admin' && !adminUser?.permissions?.includes('privileges')) redirect('/events')
 
   const [{ data: onlineOffers }, { data: offlineOffers }] = await Promise.all([
-    supabase.from('online_offers').select('*').order('created_at', { ascending: false }),
-    supabase.from('offline_offers').select('*').order('created_at', { ascending: false }),
+    adminClient.from('online_offers').select('*').order('created_at', { ascending: false }),
+    adminClient.from('offline_offers').select('*').order('created_at', { ascending: false }),
   ])
 
   return (

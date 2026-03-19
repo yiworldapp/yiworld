@@ -37,7 +37,7 @@ export default async function ViewMemberPage({ params }: { params: Promise<{ id:
   const { data: adminUser } = await adminClient.from('admin_users').select('role, permissions').eq('id', user!.id).single()
   if (adminUser?.role !== 'super_admin' && !adminUser?.permissions?.includes('members')) redirect('/events')
 
-  const { data: member } = await supabase.from('profiles').select('*').eq('id', id).single()
+  const { data: member } = await adminClient.from('profiles').select('*').eq('id', id).single()
   if (!member) notFound()
 
   const fullName = [member.first_name, member.last_name].filter(Boolean).join(' ') || 'Unnamed'

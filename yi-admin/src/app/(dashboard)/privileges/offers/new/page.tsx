@@ -9,7 +9,7 @@ export default async function NewOfferPage() {
   const { data: adminUser } = await adminClient.from('admin_users').select('role, permissions').eq('id', user!.id).single()
   if (adminUser?.role !== 'super_admin' && !adminUser?.permissions?.includes('privileges')) redirect('/events')
 
-  const { data: partners } = await supabase.from('partners').select('*').eq('is_active', true).order('name')
+  const { data: partners } = await adminClient.from('partners').select('*').eq('is_active', true).order('name')
 
   return (
     <div className="space-y-6">

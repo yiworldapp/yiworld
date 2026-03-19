@@ -11,7 +11,7 @@ export default async function EditOfflineOfferPage({ params }: { params: Promise
   const { data: adminUser } = await adminClient.from('admin_users').select('role, permissions').eq('id', user.id).single()
   if (adminUser?.role !== 'super_admin' && !adminUser?.permissions?.includes('privileges')) redirect('/events')
 
-  const { data: offer } = await supabase.from('offline_offers').select('*').eq('id', id).single()
+  const { data: offer } = await adminClient.from('offline_offers').select('*').eq('id', id).single()
   if (!offer) notFound()
 
   return (

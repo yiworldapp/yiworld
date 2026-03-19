@@ -10,7 +10,7 @@ export default async function EditPartnerPage({ params }: { params: Promise<{ id
   const { data: adminUser } = await adminClient.from('admin_users').select('role, permissions').eq('id', user!.id).single()
   if (adminUser?.role !== 'super_admin' && !adminUser?.permissions?.includes('privileges')) redirect('/events')
 
-  const { data: partner } = await supabase.from('partners').select('*').eq('id', id).single()
+  const { data: partner } = await adminClient.from('partners').select('*').eq('id', id).single()
   if (!partner) notFound()
 
   return (

@@ -13,8 +13,8 @@ export default async function EditMemberPage({ params }: { params: Promise<{ id:
   if (adminUser?.role !== 'super_admin' && !adminUser?.permissions?.includes('members')) redirect('/events')
 
   const [{ data: member }, { data: verticals }] = await Promise.all([
-    supabase.from('profiles').select('*').eq('id', id).single(),
-    supabase.from('verticals').select('slug, label').order('label'),
+    adminClient.from('profiles').select('*').eq('id', id).single(),
+    adminClient.from('verticals').select('slug, label').order('label'),
   ])
   if (!member) notFound()
 

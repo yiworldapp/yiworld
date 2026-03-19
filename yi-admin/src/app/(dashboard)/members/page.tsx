@@ -22,7 +22,7 @@ export default async function MembersPage({
   if (adminUser?.role !== 'super_admin' && !adminUser?.permissions?.includes('members')) redirect('/events')
 
   const params = await searchParams
-  let query = supabase.from('profiles').select('*').order('created_at', { ascending: false })
+  let query = adminClient.from('profiles').select('*').order('created_at', { ascending: false })
 
   if (params.type) query = query.eq('member_type', params.type)
   if (params.vertical) query = query.eq('yi_vertical', params.vertical)

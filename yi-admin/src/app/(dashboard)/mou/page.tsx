@@ -20,7 +20,7 @@ export default async function MOUPage({ searchParams }: { searchParams: Promise<
   const { tag } = await searchParams
   const activeTag = tag && tag !== 'all' ? tag : null
 
-  let query = supabase.from('mous').select('*').order('created_at', { ascending: false })
+  let query = adminClient.from('mous').select('*').order('created_at', { ascending: false })
   if (activeTag) query = query.eq('tag', activeTag)
 
   const { data: mous } = await query
