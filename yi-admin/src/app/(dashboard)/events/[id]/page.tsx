@@ -124,7 +124,7 @@ export default async function ViewEventPage({ params }: { params: Promise<{ id: 
             <div className="flex items-start gap-3">
               <Calendar className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
               <div>
-                <p className="text-sm font-medium">{format(new Date(event.starts_at), 'EEEE, dd/MM/yyyy')}</p>
+                <p className="text-sm font-medium">{format(new Date(event.starts_at), 'EEEE, d MMMM yyyy')}</p>
                 <p className="text-xs text-muted-foreground">{format(new Date(event.starts_at), 'h:mm a')}
                   {event.ends_at && ` — ${format(new Date(event.ends_at), 'h:mm a')}`}
                 </p>
@@ -135,7 +135,7 @@ export default async function ViewEventPage({ params }: { params: Promise<{ id: 
                 <Clock className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
                 <div>
                   <p className="text-xs text-muted-foreground">Ends</p>
-                  <p className="text-sm font-medium">{format(new Date(event.ends_at), 'EEEE, dd/MM/yyyy')}</p>
+                  <p className="text-sm font-medium">{format(new Date(event.ends_at), 'EEEE, d MMMM yyyy')}</p>
                 </div>
               </div>
             )}

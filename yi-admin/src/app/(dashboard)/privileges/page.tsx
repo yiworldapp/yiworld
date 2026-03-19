@@ -109,7 +109,7 @@ export default async function PrivilegesPage() {
                         : <span className="text-muted-foreground text-sm">—</span>}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-muted-foreground hidden md:table-cell text-sm">
-                      {offer.expiry_date ? format(new Date(offer.expiry_date), 'dd/MM/yyyy') : '—'}
+                      {offer.expiry_date ? format(new Date(offer.expiry_date), 'd MMM yyyy') : '—'}
                     </TableCell>
                     <TableCell className="px-4 py-3">
                       <Badge variant={offer.is_active ? 'default' : 'secondary'} className="text-xs font-medium">
@@ -184,7 +184,7 @@ export default async function PrivilegesPage() {
                         : <span className="text-muted-foreground">—</span>}
                     </TableCell>
                     <TableCell className="px-4 py-3 text-muted-foreground hidden md:table-cell text-sm">
-                      {offer.expiry_date ? format(new Date(offer.expiry_date), 'dd/MM/yyyy') : '—'}
+                      {offer.expiry_date ? format(new Date(offer.expiry_date), 'd MMM yyyy') : '—'}
                     </TableCell>
                     <TableCell className="px-4 py-3">
                       <Badge variant={offer.is_active ? 'default' : 'secondary'} className="text-xs font-medium">

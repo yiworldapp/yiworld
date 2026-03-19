@@ -328,10 +328,10 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                             startsAt.month == endsAt.month &&
                             startsAt.day == endsAt.day;
                         if (!sameDay) {
-                          return '${DateFormat('dd/MM').format(startsAt)} – ${DateFormat('dd/MM/yyyy').format(endsAt)}';
+                          return '${DateFormat('d MMM').format(startsAt)} – ${DateFormat('d MMM yyyy').format(endsAt)}';
                         }
                       }
-                      return DateFormat('EEEE, dd/MM/yyyy').format(startsAt);
+                      return DateFormat('EEEE, d MMMM yyyy').format(startsAt);
                     }(),
                     subtitle: () {
                       final endsAtStr = event['ends_at'] as String?;

@@ -114,7 +114,7 @@ export default async function AdminUsersPage() {
                     )}
                   </td>
                   <td className="py-3 px-4 hidden lg:table-cell text-muted-foreground text-sm">
-                    {format(new Date(admin.created_at), 'dd/MM/yyyy')}
+                    {format(new Date(admin.created_at), 'd MMM yyyy')}
                   </td>
                   <td className="py-3 px-4 text-right">
                     <AdminUserActions admin={admin} currentUserId={user!.id} />

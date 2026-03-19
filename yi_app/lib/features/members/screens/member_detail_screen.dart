@@ -267,7 +267,7 @@ class MemberDetailScreen extends StatelessWidget {
                       // ── Personal ──────────────────────────────────────────
                       _sectionHeader('Personal'),
                       _detailRow(Icons.cake_outlined, 'Birthday',
-                          dob != null ? DateFormat('dd/MM/yyyy').format(dob) : '–'),
+                          dob != null ? DateFormat('d MMMM yyyy').format(dob) : '–'),
                       _detailRow(Icons.bloodtype_outlined, 'Blood Group', s(m['blood_group'] as String?)),
                       _detailRow(Icons.favorite_outline, 'Relationship',
                           relationshipStatus == 'married' ? 'Married'
@@ -278,7 +278,7 @@ class MemberDetailScreen extends StatelessWidget {
                             m['is_spouse_yi_member'] == true ? 'Yes'
                             : m['is_spouse_yi_member'] == false ? 'No' : '–'),
                         _detailRow(Icons.celebration_outlined, 'Anniversary',
-                            anniversaryDate != null ? DateFormat('dd/MM/yyyy').format(anniversaryDate) : '–'),
+                            anniversaryDate != null ? DateFormat('d MMMM yyyy').format(anniversaryDate) : '–'),
                       ],
 
                       // ── Business Tags ─────────────────────────────────────

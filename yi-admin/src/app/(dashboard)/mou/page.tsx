@@ -92,7 +92,7 @@ export default async function MOUPage({ searchParams }: { searchParams: Promise<
                   <Badge variant="secondary" className="capitalize text-xs">{mou.tag}</Badge>
                 </TableCell>
                 <TableCell className="px-4 py-3 text-muted-foreground hidden sm:table-cell text-sm">
-                  {format(new Date(mou.created_at), 'dd/MM/yyyy')}
+                  {format(new Date(mou.created_at), 'd MMM yyyy')}
                 </TableCell>
                 <TableCell className="px-4 py-3 text-right">
                   <div className="flex items-center justify-end gap-1">

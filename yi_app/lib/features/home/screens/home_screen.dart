@@ -758,12 +758,12 @@ class EventCard extends StatelessWidget {
                                   startsAt.month == endsAt.month &&
                                   startsAt.day == endsAt.day;
                               if (sameDay) {
-                                return '${DateFormat('EEE, dd/MM · h:mm a').format(startsAt)} – ${DateFormat('h:mm a').format(endsAt)}';
+                                return '${DateFormat('EEE, d MMM · h:mm a').format(startsAt)} – ${DateFormat('h:mm a').format(endsAt)}';
                               } else {
-                                return '${DateFormat('dd/MM').format(startsAt)} – ${DateFormat('dd/MM · h:mm a').format(endsAt)}';
+                                return '${DateFormat('d MMM').format(startsAt)} – ${DateFormat('d MMM · h:mm a').format(endsAt)}';
                               }
                             }
-                            return DateFormat('EEE, dd/MM · h:mm a').format(startsAt);
+                            return DateFormat('EEE, d MMM · h:mm a').format(startsAt);
                           }(),
                           style: const TextStyle(color: AppColors.textMuted, fontSize: 13),
                           overflow: TextOverflow.ellipsis,
