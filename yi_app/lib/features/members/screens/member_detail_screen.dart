@@ -382,7 +382,7 @@ class MemberDetailScreen extends StatelessWidget {
   }
 
   Widget _linkOrDash(IconData icon, String label, String? url) {
-    final hasUrl = url != null && url.isNotEmpty;
+    final hasUrl = url != null && url.isNotEmpty && url.trim() != '-';
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
       child: GestureDetector(

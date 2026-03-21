@@ -177,13 +177,13 @@ class ProfileScreen extends StatelessWidget {
                       // ── Social ───────────────────────────────────────────
                       if (_hasSocial(p)) ...[
                         _sectionHeader('Social'),
-                        if ((p['linkedin_url']  as String?)?.isNotEmpty == true)
+                        if (_isLink(p['linkedin_url']  as String?))
                           _linkRow(context, Icons.link, 'LinkedIn', p['linkedin_url'] as String),
-                        if ((p['instagram_url'] as String?)?.isNotEmpty == true)
+                        if (_isLink(p['instagram_url'] as String?))
                           _linkRow(context, Icons.camera_alt_outlined, 'Instagram', p['instagram_url'] as String),
-                        if ((p['twitter_url']   as String?)?.isNotEmpty == true)
+                        if (_isLink(p['twitter_url']   as String?))
                           _linkRow(context, Icons.alternate_email, 'Twitter / X', p['twitter_url'] as String),
-                        if ((p['facebook_url']  as String?)?.isNotEmpty == true)
+                        if (_isLink(p['facebook_url']  as String?))
                           _linkRow(context, Icons.facebook, 'Facebook', p['facebook_url'] as String),
                       ],
 
@@ -218,7 +218,7 @@ class ProfileScreen extends StatelessWidget {
                           }()),
                         if ((p['business_bio'] as String?)?.isNotEmpty == true)
                           _detailRow(Icons.info_outline, 'About Business', p['business_bio'] as String),
-                        if ((p['business_website'] as String?)?.isNotEmpty == true)
+                        if (_isLink(p['business_website'] as String?))
                           _linkRow(context, Icons.link_outlined, 'Website', p['business_website'] as String),
                       ],
 
@@ -278,11 +278,13 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
+  bool _isLink(String? s) => s != null && s.isNotEmpty && s.trim() != '-';
+
   bool _hasSocial(Map<String, dynamic> p) =>
-      (p['linkedin_url']  as String?)?.isNotEmpty == true ||
-      (p['instagram_url'] as String?)?.isNotEmpty == true ||
-      (p['twitter_url']   as String?)?.isNotEmpty == true ||
-      (p['facebook_url']  as String?)?.isNotEmpty == true;
+      _isLink(p['linkedin_url']  as String?) ||
+      _isLink(p['instagram_url'] as String?) ||
+      _isLink(p['twitter_url']   as String?) ||
+      _isLink(p['facebook_url']  as String?);
 
   Widget _sectionHeader(String title) => Padding(
     padding: const EdgeInsets.only(top: 4, bottom: 12),
