@@ -204,7 +204,8 @@ class MemberDetailScreen extends StatelessWidget {
                               child: OutlinedButton.icon(
                                 onPressed: () {
                                   final digits = phone.replaceAll(RegExp(r'[^\d]'), '');
-                                  launchUrl(Uri.parse('https://wa.me/$digits'));
+                                  final waNumber = digits.length == 10 ? '91$digits' : digits;
+                                  launchUrl(Uri.parse('https://wa.me/$waNumber'));
                                 },
                                 icon: const FaIcon(FontAwesomeIcons.whatsapp, size: 16),
                                 label: const Text('WhatsApp'),
