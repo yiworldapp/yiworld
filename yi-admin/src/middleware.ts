@@ -35,9 +35,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (user && isDashboard) {
+    // Single query — fetch role + permissions together (was two queries before)
     const { data: adminUser } = await supabase
       .from('admin_users')
-      .select('role')
+      .select('role, permissions')
       .eq('id', user.id)
       .single()
 
@@ -47,12 +48,7 @@ export async function middleware(request: NextRequest) {
     }
 
     if (adminUser.role === 'committee') {
-      const { data: fullAdmin } = await supabase
-        .from('admin_users')
-        .select('permissions')
-        .eq('id', user.id)
-        .single()
-      const perms: string[] = fullAdmin?.permissions || []
+      const perms: string[] = adminUser.permissions || []
       const routePermMap: Record<string, string> = {
         '/members': 'members',
         '/mou': 'mou',

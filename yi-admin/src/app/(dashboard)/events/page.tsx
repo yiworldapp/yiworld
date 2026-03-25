@@ -1,4 +1,6 @@
-import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { Suspense } from 'react'
+import { getUser, getAdminProfile } from '@/lib/auth'
+import { createAdminClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/badge'
 import { LinkButton } from '@/components/ui/link-button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
@@ -8,36 +10,43 @@ import { DeleteEventButton } from './_components/delete-event-button'
 import { verticalBadgeStyle } from '@/lib/vertical-colors'
 
 export default async function EventsPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data: adminUser } = await supabase
-    .from('admin_users').select('role').eq('id', user!.id).single()
-
-  const adminSupabase = await createAdminClient()
-  let query = adminSupabase
-    .from('events')
-    .select(`*, verticals(label, color_hex, slug), event_rsvps(count)`)
-    .order('starts_at', { ascending: false })
-
-  if (adminUser?.role === 'committee') {
-    query = query.eq('created_by', user!.id)
-  }
-
-  const { data: events } = await query
+  const user = await getUser()           // cached — free if layout already called it
+  const adminUser = await getAdminProfile() // cached — free
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Events</h1>
-          <p className="text-muted-foreground text-sm mt-1">{events?.length || 0} total events</p>
-        </div>
+        <h1 className="text-2xl font-bold tracking-tight">Events</h1>
         <LinkButton href="/events/new" className="bg-primary hover:bg-primary/90">
           <Plus className="mr-2 h-4 w-4" />
           New Event
         </LinkButton>
       </div>
 
+      <Suspense fallback={<EventsTableSkeleton />}>
+        <EventsTable
+          userId={user!.id}
+          isCommittee={adminUser?.role === 'committee'}
+        />
+      </Suspense>
+    </div>
+  )
+}
+
+async function EventsTable({ userId, isCommittee }: { userId: string; isCommittee: boolean }) {
+  const adminClient = await createAdminClient()
+  let query = adminClient
+    .from('events')
+    .select(`*, verticals(label, color_hex, slug), event_rsvps(count)`)
+    .order('starts_at', { ascending: false })
+
+  if (isCommittee) query = query.eq('created_by', userId)
+
+  const { data: events } = await query
+
+  return (
+    <>
+      <p className="text-muted-foreground text-sm -mt-4">{events?.length || 0} total events</p>
       <div className="rounded-lg border border-border overflow-hidden">
         <Table>
           <TableHeader className="bg-muted/40">
@@ -113,6 +122,22 @@ export default async function EventsPage() {
           </TableBody>
         </Table>
       </div>
+    </>
+  )
+}
+
+function EventsTableSkeleton() {
+  return (
+    <div className="rounded-lg border border-border overflow-hidden animate-pulse">
+      <div className="bg-muted/40 border-b border-border h-10" />
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="flex items-center gap-4 px-4 py-3 border-b border-border last:border-b-0">
+          <div className="w-8 h-8 bg-muted rounded shrink-0" />
+          <div className="flex-1 h-4 bg-muted rounded w-48" />
+          <div className="h-4 bg-muted rounded w-32 hidden lg:block" />
+          <div className="h-5 bg-muted rounded w-16 hidden sm:block ml-auto" />
+        </div>
+      ))}
     </div>
   )
 }
